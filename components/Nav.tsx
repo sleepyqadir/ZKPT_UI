@@ -17,6 +17,9 @@ import {
   Center,
 } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
+import { useWeb3React } from '@web3-react/core'
+import useEagerConnect from '../hooks/useEagerConnect'
+import Account from './Account'
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -36,17 +39,14 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode()
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { account, library } = useWeb3React()
+  const triedToEagerConnect = useEagerConnect()
   return (
     <>
       <Box px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <Box>
-            <div className="container">
-              <div className="text-box">
-                <h1>ZKPT</h1>
-                <h1>ZKPT</h1>
-              </div>
-            </div>
+            <h1>ZKPT</h1>
           </Box>
 
           <Flex alignItems={'center'}>
@@ -54,7 +54,6 @@ export default function Nav() {
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
               </Button>
-
               <Menu>
                 <MenuButton
                   as={Button}
@@ -63,9 +62,7 @@ export default function Nav() {
                   cursor={'pointer'}
                   minW={0}
                 >
-                  <Button colorScheme="green" size="sm">
-                    Connect Wallet
-                  </Button>
+                  <Account triedToEagerConnect={triedToEagerConnect} />
                 </MenuButton>
                 <MenuList alignItems={'center'}>
                   <br />
@@ -81,8 +78,6 @@ export default function Nav() {
                   </Center>
                   <br />
                   <MenuDivider />
-                  <MenuItem>Your Servers</MenuItem>
-                  <MenuItem>Account Settings</MenuItem>
                   <MenuItem>Logout</MenuItem>
                 </MenuList>
               </Menu>
