@@ -23,13 +23,12 @@ function Home() {
   return (
     <div
       style={{
-        backgroundImage: `url(${Background.src})`,
         height: '100vh',
         backgroundPosition: 'center',
       }}
     >
       <Nav />
-      {/* <Account triedToEagerConnect={triedToEagerConnect} /> */}
+      
       <Hero />
       {/* 
       <main>
