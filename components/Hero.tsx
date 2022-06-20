@@ -24,10 +24,9 @@ const Hero = () => {
             fontWeight={600}
             fontSize={{ base: '2xl', sm: '4xl', md: '6xl' }}
             lineHeight={'110%'}
-            color={'white'}
           >
             Make money from <br />
-            <Text as={'span'} color={'green.400'}>
+            <Text as={'span'} color={'#fc6643'}>
               your savings
             </Text>
           </Heading>
@@ -45,7 +44,7 @@ const Hero = () => {
           >
             <Button
               colorScheme={'green'}
-              bg={'green.400'}
+              bg={'#fc6643'}
               rounded={'full'}
               px={6}
               _hover={{
@@ -53,9 +52,6 @@ const Hero = () => {
               }}
             >
               Get Started
-            </Button>
-            <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
-              Learn more
             </Button>
             <Box>
               <Icon
@@ -65,7 +61,6 @@ const Hero = () => {
                 position={'absolute'}
                 right={-71}
                 top={'10px'}
-                color={'white'}
               />
               <Text
                 fontSize={'lg'}
@@ -74,7 +69,6 @@ const Hero = () => {
                 right={'-125px'}
                 top={'-15px'}
                 transform={'rotate(10deg)'}
-                color={'white'}
               >
                 Starting at 1 ETH
               </Text>

@@ -14,25 +14,11 @@ a {
   box-sizing: border-box;
 }
 
-.text-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 h1 {
   font-size: 8vw;
-  font-weight: 900;
-  background-color: #48bb78;
-  color: black;
+  font-weight: 'bolder';
+  background-color: #fc6643;
+  color: white;
   display: block;
   padding: 0.5em;
-}
-
-h1:nth-child(2) {
-  position: absolute;
-  background-color: black;
-  color: white;
-  clip-path: inset(-1% -1% 50% -1%);
 }
