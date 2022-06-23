@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Head from 'next/head'
 import {
   Box,
@@ -10,7 +11,10 @@ import {
   useColorModeValue,
   createIcon,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+
 const Hero = () => {
+  const router = useRouter()
   return (
     <>
       <Container maxW={'3xl'}>
@@ -43,13 +47,14 @@ const Hero = () => {
             position={'relative'}
           >
             <Button
-              colorScheme={'green'}
+              colorScheme={'orange'}
               bg={'#fc6643'}
               rounded={'full'}
               px={6}
               _hover={{
-                bg: 'green.500',
+                bg: 'orange.390',
               }}
+              onClick={() => router.push('/app')}
             >
               Get Started
             </Button>

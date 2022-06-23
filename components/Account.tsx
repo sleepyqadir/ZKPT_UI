@@ -57,7 +57,7 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
                 }
               })
             }}
-            colorScheme="green"
+            colorScheme="#fc6643"
             size="sm"
           >
             {isMetaMaskInstalled ? 'Connect to MetaMask' : 'Connect to Wallet'}{' '}
