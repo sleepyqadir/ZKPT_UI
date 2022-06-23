@@ -1,9 +1,37 @@
-// @ts-check
+/** @type {import('next').NextConfig} */
 
-/**
- * @type {import('next').NextConfig}
- **/
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
-};
+  env: {
+    ROOT: __dirname,
+  },
+  webpack: (config, { isServer, webpack }) => {
+
+    if (!isServer) {
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          global: "global"
+        })
+      )
+      config.resolve.fallback = {
+        fs: false,
+        stream: false,
+        crypto: false,
+        os: false,
+        readline: false,
+        ejs: false,
+        assert: require.resolve("assert"),
+        path: false,
+        events: false,
+        global: false
+      }
+
+      return config
+    }
+
+    return config
+  }
+}
+
+module.exports = nextConfig
+
