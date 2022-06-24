@@ -145,15 +145,34 @@ export const parseBalance = (
 ) => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
 
 export const depositEth = async (deposit: Deposit, contract: Pool) => {
-  console.log('Sending deposit transaction...');
-  const commitment = deposit.commitment;
-  const nullifierHash = deposit.nullifierHash;
-  // @ts-ignore
-  const tx = await contract.deposit(commitment, nullifierHash, {
-    value: ethers.utils.parseEther('1'),
-  });
-  const txReceipt = await tx.wait();
-  console.log(`https://rinkeby.etherscan.io/tx/${txReceipt.transactionHash}`);
+  try {
+    const network = await contract.signer.provider.getNetwork();
+    const valid = isSupportedNetwork(network.chainId);
+    if (!valid) {
+      return {
+        type: 'error',
+        title: 'Network Errr',
+        message: 'the selected network is not supported yet try [rinkeby]',
+      };
+    } else {
+      console.log('Sending deposit transaction...');
+      const commitment = deposit.commitment;
+      const nullifierHash = deposit.nullifierHash;
+      // @ts-ignore
+      const tx = await contract.deposit(commitment, nullifierHash, {
+        value: ethers.utils.parseEther('1'),
+      });
+      const txReceipt = await tx.wait();
+      console.log(
+        `https://rinkeby.etherscan.io/tx/${txReceipt.transactionHash}`
+      );
+      return {
+        type: 'success',
+        title: 'Transaction Success',
+        message: `https://rinkeby.etherscan.io/tx/${txReceipt.transactionHash}`,
+      };
+    }
+  } catch (err) {}
 };
 
 export const withdraw = async (note, recipient, contract: Pool) => {
@@ -172,6 +191,7 @@ export const withdraw = async (note, recipient, contract: Pool) => {
   console.log({ proof, args });
 
   console.log({ relayer });
+  // @ts-ignore
   const tx = await contract.withdraw(proof, ...args, {});
   const txReciept = await tx.wait();
   console.log(`https://rinkeby.etherscan.io/tx/${txReciept.transactionHash}`);
@@ -243,4 +263,32 @@ const generateSnarkProof = async (
   ];
 
   return { proof: solidityProof, args };
+};
+
+export const getNetwork = (id: number) => {
+  const networks = {
+    1: 'mainnet',
+    3: 'robston',
+    4: 'rinkeby',
+    5: 'goerli',
+    137: 'Polygon Mainnet',
+    1666600000: 'Mainnet Harmony',
+    1666900000: 'Devnet Harmony',
+  };
+
+  return networks[id];
+};
+
+export const isSupportedNetwork = (id: number) => {
+  const networks = {
+    1: false,
+    3: false,
+    4: true,
+    5: false,
+    137: false,
+    1666600000: false,
+    1666900000: false,
+  };
+
+  return networks[id];
 };
