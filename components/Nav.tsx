@@ -13,6 +13,7 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { useWeb3React } from '@web3-react/core'
 import useEagerConnect from '../hooks/useEagerConnect'
 import Account from './Account'
+import Network from './Network'
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -47,6 +48,7 @@ export default function Nav() {
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
               </Button>
+              <Network />
               <Account triedToEagerConnect={triedToEagerConnect} />
             </Stack>
           </Flex>
