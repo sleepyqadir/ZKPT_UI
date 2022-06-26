@@ -3,11 +3,10 @@ import { formatUnits } from '@ethersproject/units';
 import { ethers, BigNumber } from 'ethers';
 import { MerkleTree } from './classes/merkleTree';
 import { PoseidonHasher } from './classes/PoseidonHasher';
-import { Pool } from './contracts/types';
 import path from 'path';
 import getConfig from 'next/config';
-
 import { Deposit } from './classes/deposit';
+import type { Pool } from './contracts/types';
 const circomlibjs = require('circomlibjs');
 const snarkjs = require('snarkjs');
 
@@ -48,28 +47,28 @@ export const createDeposit = async (
 };
 
 // TODO amount and networkId provided by the generateNote
-// TODO add preimage functionality
 export const generateNote = async (deposit: Deposit) => {
-  const AMOUNT = '0.1';
-  const netId = '5';
-
-  // const preimage = Buffer.concat([deposit.nullifier]);
-  // return `zkpt-eth-${AMOUNT}-${netId}-${toHex(preimage, 32)}`;
+  const AMOUNT = '1';
+  const netId = '4';
   return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}`;
 };
 
 export const parseNote = async (noteString) => {
-  const noteArray = noteString.split('0x');
-  const noteRegex = /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)/g;
-  const match = noteRegex.exec(noteArray[0]);
+  try {
+    const noteArray = noteString.split('0x');
+    const noteRegex = /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)/g;
+    const match = noteRegex.exec(noteArray[0]);
 
-  // we are ignoring `currency`, `amount`, and `netId` for this minimal example
-  // const buf = Buffer.from(match.groups.note, 'hex');
-  // console.log({ buf });
-  // const nullifier = bigInt.leBuff2int(buf.slice(0, 31));
-  const bytesArray = noteArray[1].split(',').map((x) => +x);
-  const nullifier = new Uint8Array(bytesArray);
-  return createDeposit(nullifier);
+    // we are ignoring `currency`, `amount`, and `netId` for this minimal example
+    // const buf = Buffer.from(match.groups.note, 'hex');
+    // console.log({ buf });
+    // const nullifier = bigInt.leBuff2int(buf.slice(0, 31));
+    const bytesArray = noteArray[1].split(',').map((x) => +x);
+    const nullifier = new Uint8Array(bytesArray);
+    return createDeposit(nullifier);
+  } catch (err) {
+    console.log({ err });
+  }
 };
 
 export const poseidonHash = (poseidon: any, inputs: BigNumberish[]) => {
@@ -108,17 +107,35 @@ const generateMerkleProof = async (deposit, contract: Pool) => {
   );
 
   const leafIndex = depositEvent ? depositEvent.args.leafIndex : -1;
-  // TODO error prompts on already used nullifier and
-  // Validate that our data is correct (optional)
+
   const { root, path_elements, path_index } = await tree.path(leafIndex);
-  // const isValidRoot = await contract.isKnownRoot(root);
+  const isValidRoot = await contract.isKnownRoot(root);
 
-  // const isSpent = await contract.isSpent(deposit.nullifierHash);
-  // assert(isValidRoot === true, "Merkle tree is corrupted");
-  // assert(isSpent === false, "The note is already spent");
-  // assert(leafIndex >= 0, "The deposit is not found in the tree");
+  if (!isValidRoot) {
+    return {
+      type: 'error',
+      title: 'Merkle Tree',
+      message: 'Merkle Tree is corrupted either invalid paths',
+    };
+  }
 
-  // Compute merkle proof of our commitment
+  const isSpent = await contract.isSpent(deposit.nullifierHash);
+
+  if (isSpent) {
+    return {
+      type: 'error',
+      title: 'Already Spent',
+      message: 'The provided ticket is already spent',
+    };
+  }
+  if (leafIndex < 0) {
+    return {
+      type: 'error',
+      title: 'Deposit Leaf',
+      message: 'The deposit is not found in the tree',
+    };
+  }
+
   return { path_elements, path_index, root };
 };
 
@@ -172,29 +189,64 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
         message: `https://rinkeby.etherscan.io/tx/${txReceipt.transactionHash}`,
       };
     }
-  } catch (err) {}
+  } catch (err) {
+    return {
+      type: 'error',
+      title: 'Something went wrong',
+      message: err.message,
+    };
+  }
 };
 
 export const withdraw = async (note, recipient, contract: Pool) => {
-  const deposit = await parseNote(note);
-  console.log('deposit created ====>', { deposit });
-  const relayer = new ethers.Wallet(
-    '0x78b62bbad5c89e71f2d5609ce4b3f829e55239056d7ab9b9836e03faf5a552ef'
-  );
-  const { proof, args } = await generateSnarkProof(
-    deposit,
-    recipient,
-    contract,
-    relayer.address
-  );
-  console.log('Sending withdrawal transaction...');
-  console.log({ proof, args });
+  try {
+    const deposit = await parseNote(note);
+    console.log('deposit created ====>', { deposit });
+    if (!deposit) {
+      return {
+        type: 'error',
+        title: 'Invalid Note formet',
+        message: 'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]',
+      };
+    }
+    const snarkProof = await generateSnarkProof(
+      deposit,
+      recipient,
+      contract,
+      '0x99d667ff3e5891a5f40288cb94276158ae8176a0'
+    );
 
-  console.log({ relayer });
-  // @ts-ignore
-  const tx = await contract.withdraw(proof, ...args, {});
-  const txReciept = await tx.wait();
-  console.log(`https://rinkeby.etherscan.io/tx/${txReciept.transactionHash}`);
+    if (!snarkProof.proof) {
+      return snarkProof;
+    }
+
+    console.log('Sending withdrawal transaction...');
+    console.log({ proof: snarkProof.proof, args: snarkProof.args });
+    const response = await fetch(`/api/withdraw/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        proof: snarkProof.proof,
+        args: snarkProof.args,
+      }),
+    });
+    console.log({ response });
+
+    return {
+      type: 'success',
+      title: 'Transaction Success',
+      message: `https://rinkeby.etherscan.io/tx/`,
+    };
+  } catch (err) {
+    console.log('error while withdrawing', { err });
+    return {
+      type: 'error',
+      title: 'Something went wrong',
+      message: err.message,
+    };
+  }
 };
 
 interface Proof {
@@ -233,10 +285,16 @@ const generateSnarkProof = async (
   relayer
 ) => {
   // Compute merkle proof of our commitment
-  const { root, path_elements, path_index } = await generateMerkleProof(
-    deposit,
-    contract
-  );
+
+  const response = await generateMerkleProof(deposit, contract);
+
+  console.log({ response });
+
+  if (response.type) {
+    return { ...response };
+  }
+
+  const { root, path_elements, path_index } = response;
 
   const witness = {
     // Public

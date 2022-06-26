@@ -14,6 +14,9 @@ import { useWeb3React } from '@web3-react/core'
 import useEagerConnect from '../hooks/useEagerConnect'
 import Account from './Account'
 import Network from './Network'
+import { Router } from 'next/router'
+// import ETHBalance from './ETHBalance'
+import { useRouter } from 'next/router'
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -35,6 +38,7 @@ export default function Nav() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { account, library } = useWeb3React()
   const triedToEagerConnect = useEagerConnect()
+  const router = useRouter()
   return (
     <>
       <Box px={4}>
@@ -45,9 +49,13 @@ export default function Nav() {
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={7}>
+              {typeof account === 'string' && (
+                <Button onClick={() => router.push('/draws')}>Draws</Button>
+              )}
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
               </Button>
+              {/* {typeof account === 'string' && <ETHBalance />} */}
               <Network />
               <Account triedToEagerConnect={triedToEagerConnect} />
             </Stack>

@@ -26,6 +26,7 @@
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
     "circomlibjs": "^0.1.2",
+    "defender-relay-client": "^1.25.0",
     "framer-motion": "^6.3.11",
     "next": "12.1.6",
     "react": "18.2.0",

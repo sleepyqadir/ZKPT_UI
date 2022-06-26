@@ -25,16 +25,26 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import { createDeposit, depositEth, generateNote, withdraw } from '../util'
 import { useState } from 'react'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useWeb3React } from '@web3-react/core'
+import { ethers } from 'ethers'
+import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import Link from 'next/link'
 
 const alertTemp = {
   type: 'error',
   title: 'title',
   message: 'message',
+}
+
+const alertTempTransaction = {
+  type: 'success',
+  title: 'Transaction Success',
+  message: `https://rinkeby.etherscan.io/tx/`,
 }
 
 function App() {
@@ -55,11 +65,32 @@ function App() {
   const [withdrawLoader, setWithdrawLoader] = useState(false)
   const [depositLoader, setDepositLoader] = useState(false)
   const [alert, setAlert] = useState(alertTemp)
+  const [isAddressError, setIsAddressError] = useState(false)
+
+  const onWithdraw = async () => {
+    try {
+      console.log({ withdrawAddress, withdrawNote, contract })
+      if (!ethers.utils.isAddress(withdrawAddress)) {
+        setWithdrawLoader(false)
+        setIsAddressError(true)
+        console.log('=============>Invalid Address Formet')
+        return
+      }
+      const alert = await withdraw(withdrawNote, withdrawAddress, contract)
+      setWithdrawLoader(false)
+      // @ts-ignore
+      setAlert(alert)
+      onIsAlertOpen()
+    } catch (err) {
+      setWithdrawLoader(false)
+      console.log({ err })
+    }
+  }
 
   const onDeposit = async () => {
     try {
       const balance = await await contract.provider.getBalance(account)
-      console.log(balance.toString() / 1e18 < 1)
+      // @ts-ignore
       if (balance.toString() / 1e18 < 1) {
         setAlert({
           type: 'error',
@@ -159,6 +190,7 @@ function App() {
         </GridItem>
         <GridItem w="100%" h="10">
           <Box maxW="32rem">
+            {/* @ts-ignore */}
             <Heading mb={4} align="center">
               Sell Ticket
             </Heading>
@@ -179,17 +211,23 @@ function App() {
             <FormHelperText>
               Make sure to add correct formet of note
             </FormHelperText>
+          </FormControl>
+          <FormControl isInvalid={isAddressError}>
             <Input
-              style={{ marginTop: 10 }}
               placeholder="Withdraw Address"
               onChange={(e) => {
+                setIsAddressError(false)
                 setWithdrawAddress(e.target.value)
               }}
               style={{ marginTop: '50px' }}
             />
-            <FormHelperText>
-              Address you want to withdraw funds to
-            </FormHelperText>
+            {!isAddressError ? (
+              <FormHelperText>
+                Address you want to withdraw funds to
+              </FormHelperText>
+            ) : (
+              <FormErrorMessage>Invalid Address Formet</FormErrorMessage>
+            )}
           </FormControl>
 
           <Button
@@ -203,9 +241,9 @@ function App() {
             width="100%"
             isLoading={withdrawLoader}
             loadingText="Withdrawing"
-            onClick={async () => {
-              console.log({ withdrawAddress, withdrawNote, contract })
-              await withdraw(withdrawNote, withdrawAddress, contract)
+            onClick={() => {
+              setWithdrawLoader(true)
+              onWithdraw()
             }}
           >
             Withdraw
@@ -221,12 +259,46 @@ function App() {
         >
           <ModalOverlay />
           <ModalContent>
-            <Alert status={alert.type}>
-              <AlertIcon />
+            <Alert
+              status={alert.type}
+              variant="subtle"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              textAlign="center"
+              height="200px"
+            >
+              <AlertIcon boxSize="40px" mr={0} />
               <Box>
-                <AlertTitle>{alert.title}</AlertTitle>
-                <AlertDescription>{alert.message}</AlertDescription>
+                <AlertTitle mt={4} mb={1} fontSize="lg">
+                  {alert.title}
+                </AlertTitle>
+                <AlertDescription maxWidth="sm">
+                  {alert.message}
+                </AlertDescription>
               </Box>
+              {alert.type === 'success' && (
+                <Grid margin="2" templateColumns="repeat(2, 1fr)" gap={6}>
+                  <GridItem>
+                    <Button
+                      onClick={() => {
+                        navigator.clipboard.writeText(alert.message)
+                      }}
+                    >
+                      {' '}
+                      <CopyIcon />{' '}
+                    </Button>
+                  </GridItem>
+                  <GridItem>
+                    <Button>
+                      <Link href={alert.message}>
+                        <a target="_blank"></a>
+                      </Link>
+                      <ExternalLinkIcon />
+                    </Button>
+                  </GridItem>
+                </Grid>
+              )}
             </Alert>
           </ModalContent>
         </Modal>
@@ -250,14 +322,22 @@ function App() {
                 style={{ margin: 20 }}
                 colorScheme="#fc6643"
                 children={note}
-              />
+              ></Code>
               <Checkbox>I have backed up the note</Checkbox>
             </ModalBody>
 
             <ModalFooter>
               <Button
-                colorScheme={'orange'}
-                bg={'#fc6643'}
+                px={6}
+                mr={3}
+                onClick={() => {
+                  navigator.clipboard.writeText(note)
+                }}
+              >
+                {' '}
+                <CopyIcon />{' '}
+              </Button>
+              <Button
                 px={6}
                 _hover={{
                   bg: 'orange.390',
@@ -271,8 +351,6 @@ function App() {
                 Cancel
               </Button>
               <Button
-                colorScheme={'orange'}
-                bg={'#fc6643'}
                 px={6}
                 _hover={{
                   bg: 'orange.390',

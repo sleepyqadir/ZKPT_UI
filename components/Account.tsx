@@ -57,8 +57,13 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
                 }
               })
             }}
-            colorScheme="#fc6643"
-            size="sm"
+            colorScheme={'orange'}
+            bg={'#fc6643'}
+            loadingText="Connecting..."
+            px={6}
+            _hover={{
+              bg: 'orange.390',
+            }}
           >
             {isMetaMaskInstalled ? 'Connect to MetaMask' : 'Connect to Wallet'}{' '}
           </Button>

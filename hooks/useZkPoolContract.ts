@@ -5,3 +5,4 @@ import useContract from './useContract';
 export default function useZKPoolContract(tokenAddress?: string) {
   return useContract<Pool>(tokenAddress, POOL_ABI);
 }
+
