@@ -36,7 +36,7 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode()
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { account, library } = useWeb3React()
+  const { account, library, chainId } = useWeb3React()
   const triedToEagerConnect = useEagerConnect()
   const router = useRouter()
   return (
@@ -49,7 +49,7 @@ export default function Nav() {
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={7}>
-              {typeof account === 'string' && (
+              {typeof account === 'string' && chainId === 4 && (
                 <Button onClick={() => router.push('/draws')}>Draws</Button>
               )}
               <Button onClick={toggleColorMode}>

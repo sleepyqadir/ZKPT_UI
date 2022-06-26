@@ -1,6 +1,9 @@
 import Nav from '../components/Nav'
 import { Box, Container, Divider, Heading, Stack, Text } from '@chakra-ui/react'
 import PackageTier from '../components/PackageTier'
+import Statistics from '../components/Statistics'
+import useZKPoolContract from '../hooks/useZkPoolContract'
+import { useState, useEffect } from 'react'
 
 const options = [
   { id: 1, desc: 'Minting Period' },
@@ -9,6 +12,26 @@ const options = [
 ]
 
 function Draw() {
+  const contract = useZKPoolContract(
+    '0x1FD0E73c732E5A1Ca3867674FA84446994891C41',
+  )
+
+  const [draws, setDraws] = useState([])
+
+  const getStats = async () => {
+    const drawCount = await contract.numDraws()
+    const drawsArray = []
+    for (let index = 0; index < parseInt(drawCount.toString()); index++) {
+      const draw = await contract.draws(index)
+      drawsArray.push(draw)
+    }
+    console.log({ draws: drawsArray })
+  }
+
+  useEffect(() => {
+    contract && getStats()
+  }, [contract])
+
   return (
     <Container
       style={{
@@ -19,6 +42,7 @@ function Draw() {
       maxW="1200px"
     >
       <Nav />
+      <Statistics />
       <Box py={6} px={5} style={{ minHeight: '100vh' }}>
         <Stack spacing={4} width={'100%'} direction={'column'}>
           <Stack
@@ -57,17 +81,18 @@ function Draw() {
               </Text>
             </Stack>
           </Stack>
-          <Divider />
-          <PackageTier title={'Draw 1'} typePlan="1 ETH" options={options} />
-          <Divider />
-          <PackageTier
-            title={'Draw 2'}
-            checked={true}
-            typePlan="1 ETH"
-            options={options}
-          />
-          <Divider />
-          <PackageTier title={'Draw 3'} typePlan="1 ETH" options={options} />
+          {draws.map((draw) => {
+            return (
+              <>
+                <Divider />
+                <PackageTier
+                  title={'Draw 1'}
+                  typePlan="1 ETH"
+                  options={options}
+                />
+              </>
+            )
+          })}
         </Stack>
       </Box>
     </Container>
