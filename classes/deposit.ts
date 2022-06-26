@@ -14,7 +14,6 @@ export class Deposit {
   }
 
   get commitment(): string {
-    // @ts-ignore
     return poseidonHash(this.poseidon, [this.nullifier, 0]);
   }
 

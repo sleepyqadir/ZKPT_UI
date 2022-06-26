@@ -41,11 +41,16 @@ const alertTemp = {
   message: 'message',
 }
 
-const alertTempTransaction = {
-  type: 'success',
-  title: 'Transaction Success',
-  message: `https://rinkeby.etherscan.io/tx/`,
+export enum STATUS {
+  SUCCESS = 'success',
+  ERROR = 'error',
 }
+
+// const alertTempTransaction = {
+//   type: 'success',
+//   title: 'Transaction Success',
+//   message: `https://rinkeby.etherscan.io/tx/`,
+// }
 
 function App() {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -138,7 +143,7 @@ function App() {
       >
         <GridItem w="100%" h="10">
           <Box maxW="32rem">
-            <Heading mb={4} align="center">
+            <Heading mb={4} style={{ textAlign: 'center' }}>
               Buy Ticket
             </Heading>
             <Text fontSize="xl" align="center">
@@ -190,8 +195,7 @@ function App() {
         </GridItem>
         <GridItem w="100%" h="10">
           <Box maxW="32rem">
-            {/* @ts-ignore */}
-            <Heading mb={4} align="center">
+            <Heading mb={4} style={{ textAlign: 'center' }}>
               Sell Ticket
             </Heading>
             <Text fontSize="xl" align="center">
@@ -260,6 +264,7 @@ function App() {
           <ModalOverlay />
           <ModalContent>
             <Alert
+              // @ts-ignore
               status={alert.type}
               variant="subtle"
               flexDirection="column"

@@ -19,7 +19,7 @@ function Draw() {
       maxW="1200px"
     >
       <Nav />
-      <Box py={6} px={5} min={'100vh'}>
+      <Box py={6} px={5} style={{ minHeight: '100vh' }}>
         <Stack spacing={4} width={'100%'} direction={'column'}>
           <Stack
             p={5}

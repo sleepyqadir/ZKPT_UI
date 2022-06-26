@@ -175,7 +175,6 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
       console.log('Sending deposit transaction...');
       const commitment = deposit.commitment;
       const nullifierHash = deposit.nullifierHash;
-      // @ts-ignore
       const tx = await contract.deposit(commitment, nullifierHash, {
         value: ethers.utils.parseEther('1'),
       });
