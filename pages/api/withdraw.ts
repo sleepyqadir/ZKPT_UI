@@ -15,6 +15,7 @@ const signer = new DefenderRelaySigner(credentials, provider, {
 });
 
 import POOL_ABI from '../../contracts/Pool.json';
+import { getAddress } from '../../util';
 
 export default async (req, res) => {
   const {
@@ -22,7 +23,7 @@ export default async (req, res) => {
   } = req;
 
   const contract = new Contract(
-    '0x1FD0E73c732E5A1Ca3867674FA84446994891C41',
+    getAddress(),
     POOL_ABI,
     signer
   );

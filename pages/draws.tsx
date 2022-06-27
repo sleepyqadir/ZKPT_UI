@@ -4,6 +4,7 @@ import PackageTier from '../components/PackageTier'
 import Statistics from '../components/Statistics'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useState, useEffect } from 'react'
+import { getAddress } from '../util';
 
 const options = [
   { id: 1, desc: 'Minting Period' },
@@ -12,9 +13,7 @@ const options = [
 ]
 
 function Draw() {
-  const contract = useZKPoolContract(
-    '0x1FD0E73c732E5A1Ca3867674FA84446994891C41',
-  )
+  const contract = useZKPoolContract(getAddress())
 
   const [draws, setDraws] = useState([])
 
@@ -87,7 +86,7 @@ function Draw() {
                 <Divider />
                 <PackageTier
                   title={'Draw 1'}
-                  typePlan="1 ETH"
+                  typePlan="0.1 ETH"
                   options={options}
                 />
               </>

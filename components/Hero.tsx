@@ -73,7 +73,7 @@ const Hero = () => {
                 top={'-15px'}
                 transform={'rotate(10deg)'}
               >
-                Starting at 1 ETH
+                Starting at 0.1 ETH
               </Text>
             </Box>
           </Stack>

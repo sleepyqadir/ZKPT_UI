@@ -13,6 +13,7 @@ import { BsPerson } from 'react-icons/bs'
 import { FiServer } from 'react-icons/fi'
 import { FiDollarSign } from 'react-icons/fi'
 import useZKPoolContract from '../hooks/useZkPoolContract'
+import { getAddress } from '../util';
 
 interface StatsCardProps {
   title: string
@@ -51,7 +52,7 @@ function StatsCard(props: StatsCardProps) {
 
 export default function Statistics() {
   const contract = useZKPoolContract(
-    '0x1FD0E73c732E5A1Ca3867674FA84446994891C41',
+    getAddress(),
   )
 
   const [users, setUsers] = useState(0)

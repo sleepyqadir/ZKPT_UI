@@ -27,7 +27,7 @@ import {
   AlertDescription,
   FormErrorMessage,
 } from '@chakra-ui/react'
-import { createDeposit, depositEth, generateNote, withdraw } from '../util'
+import { createDeposit, depositEth, generateNote, withdraw, getAddress } from '../util';
 import { useState } from 'react'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useWeb3React } from '@web3-react/core'
@@ -60,7 +60,7 @@ function App() {
     onClose: onIsAlertClose,
   } = useDisclosure()
   const contract = useZKPoolContract(
-    '0x1FD0E73c732E5A1Ca3867674FA84446994891C41',
+    getAddress(),
   )
   const { chainId, account } = useWeb3React()
   const [note, setNote] = useState('')
@@ -96,7 +96,7 @@ function App() {
     try {
       const balance = await await contract.provider.getBalance(account)
       // @ts-ignore
-      if (balance.toString() / 1e18 < 1) {
+      if (balance.toString() / 1e18 < 0.1) {
         setAlert({
           type: 'error',
           title: 'Insufficient Balance',
@@ -163,12 +163,12 @@ function App() {
                   Curr<h2>ETH</h2>
                 </div>
                 <div className="wp">
-                  Prize<h2>1.00</h2>
+                  Prize<h2>0.001</h2>
                 </div>
               </div>
               <div className="total clearfix">
                 <h2>
-                  Total : <p>1.00 ETH</p>
+                  Total : <p>0.1 ETH</p>
                 </h2>
               </div>
             </div>

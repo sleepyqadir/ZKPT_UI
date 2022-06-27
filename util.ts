@@ -39,18 +39,18 @@ const ETHERSCAN_PREFIXES = {
 };
 
 export const createDeposit = async (
-  nullifier = ethers.utils.randomBytes(15)
+  nullifier = ethers.utils.randomBytes(15),
+  secret = ethers.utils.randomBytes(15)
 ) => {
   const poseidon = await circomlibjs.buildPoseidon();
-  const deposit = Deposit.new(nullifier, poseidon);
+  const deposit = Deposit.new(nullifier, secret, poseidon);
   return deposit;
 };
 
-// TODO amount and networkId provided by the generateNote
 export const generateNote = async (deposit: Deposit) => {
-  const AMOUNT = '1';
+  const AMOUNT = '0.1';
   const netId = '4';
-  return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}`;
+  return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}-0x${deposit.secret}`;
 };
 
 export const parseNote = async (noteString) => {
@@ -59,13 +59,11 @@ export const parseNote = async (noteString) => {
     const noteRegex = /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)/g;
     const match = noteRegex.exec(noteArray[0]);
 
-    // we are ignoring `currency`, `amount`, and `netId` for this minimal example
-    // const buf = Buffer.from(match.groups.note, 'hex');
-    // console.log({ buf });
-    // const nullifier = bigInt.leBuff2int(buf.slice(0, 31));
-    const bytesArray = noteArray[1].split(',').map((x) => +x);
-    const nullifier = new Uint8Array(bytesArray);
-    return createDeposit(nullifier);
+    const bytesArrayNullifier = noteArray[1].split(',').map((x) => +x);
+    const nullifier = new Uint8Array(bytesArrayNullifier);
+    const bytesArraySecret = noteArray[2].split(',').map((x) => +x);
+    const secret = new Uint8Array(bytesArraySecret);
+    return createDeposit(nullifier, secret);
   } catch (err) {
     console.log({ err });
   }
@@ -176,7 +174,7 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
       const commitment = deposit.commitment;
       const nullifierHash = deposit.nullifierHash;
       const tx = await contract.deposit(commitment, nullifierHash, {
-        value: ethers.utils.parseEther('1'),
+        value: ethers.utils.parseEther('0.1'),
       });
       const txReceipt = await tx.wait();
       console.log(
@@ -205,14 +203,15 @@ export const withdraw = async (note, recipient, contract: Pool) => {
       return {
         type: 'error',
         title: 'Invalid Note formet',
-        message: 'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]',
+        message:
+          'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
       };
     }
     const snarkProof = await generateSnarkProof(
       deposit,
       recipient,
       contract,
-      '0x99d667ff3e5891a5f40288cb94276158ae8176a0'
+      process.env.RELAYER_ADDRESS
     );
 
     if (!snarkProof.proof) {
@@ -302,7 +301,7 @@ const generateSnarkProof = async (
     recipient: recipient,
     relayer,
     fee: 0,
-    secret: 1,
+    secret: BigNumber.from(deposit.secret).toBigInt(),
     // Private
     nullifier: BigNumber.from(deposit.nullifier).toBigInt(),
     pathElements: path_elements,
@@ -348,4 +347,8 @@ export const isSupportedNetwork = (id: number) => {
   };
 
   return networks[id];
+};
+
+export const getAddress = () => {
+  return process.env.POOL_ADDRESS;
 };
