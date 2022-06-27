@@ -151,6 +151,7 @@ function Check() {
           <Input
             placeholder="Withdraw Note"
             onChange={(e) => {
+              // @ts-ignore
               setWithdrawNote(e.target.value)
             }}
           />
