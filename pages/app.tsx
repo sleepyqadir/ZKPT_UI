@@ -27,7 +27,13 @@ import {
   AlertDescription,
   FormErrorMessage,
 } from '@chakra-ui/react'
-import { createDeposit, depositEth, generateNote, withdraw, getAddress } from '../util';
+import {
+  createDeposit,
+  depositEth,
+  generateNote,
+  withdraw,
+  getAddress,
+} from '../util'
 import { useState } from 'react'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useWeb3React } from '@web3-react/core'
@@ -59,9 +65,7 @@ function App() {
     onOpen: onIsAlertOpen,
     onClose: onIsAlertClose,
   } = useDisclosure()
-  const contract = useZKPoolContract(
-    getAddress(),
-  )
+  const contract = useZKPoolContract(getAddress())
   const { chainId, account } = useWeb3React()
   const [note, setNote] = useState('')
   const [deposit, setDeposit] = useState(null)
@@ -69,6 +73,7 @@ function App() {
   const [withdrawNote, setWithdrawNote] = useState('')
   const [withdrawLoader, setWithdrawLoader] = useState(false)
   const [depositLoader, setDepositLoader] = useState(false)
+  const [sendDepositLoader, setSendDepositLoader] = useState(false)
   const [alert, setAlert] = useState(alertTemp)
   const [isAddressError, setIsAddressError] = useState(false)
 
@@ -113,6 +118,7 @@ function App() {
         setNote(depositNote)
       }
     } catch (err) {
+      console.log({ err })
       setDepositLoader(false)
     }
   }
@@ -120,6 +126,7 @@ function App() {
   const onDepositTransaction = async () => {
     setDepositLoader(false)
     const alert = await depositEth(deposit, contract)
+    setSendDepositLoader(false)
     setAlert(alert)
     onIsAlertOpen()
     onClose()
@@ -278,7 +285,7 @@ function App() {
                 <AlertTitle mt={4} mb={1} fontSize="lg">
                   {alert.title}
                 </AlertTitle>
-                <AlertDescription maxWidth="sm">
+                <AlertDescription maxWidth="md">
                   {alert.message}
                 </AlertDescription>
               </Box>
@@ -360,7 +367,10 @@ function App() {
                 _hover={{
                   bg: 'orange.390',
                 }}
+                isLoading={sendDepositLoader}
+                loadingText="Depositing..."
                 onClick={async () => {
+                  setSendDepositLoader(true)
                   await onDepositTransaction()
                 }}
               >

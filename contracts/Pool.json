@@ -1,5 +1,7 @@
-[{
-    "inputs": [{
+[
+  {
+    "inputs": [
+      {
         "internalType": "contract IVerifier",
         "name": "_verifier",
         "type": "address"
@@ -18,6 +20,11 @@
         "internalType": "address",
         "name": "_hasher",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_relayer",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -25,7 +32,8 @@
   },
   {
     "anonymous": false,
-    "inputs": [{
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "bytes32",
         "name": "commitment",
@@ -49,7 +57,8 @@
   },
   {
     "anonymous": false,
-    "inputs": [{
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "address",
         "name": "creator",
@@ -73,25 +82,8 @@
   },
   {
     "anonymous": false,
-    "inputs": [{
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
-        "type": "address"
-      },
+    "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [{
         "indexed": false,
         "internalType": "address",
         "name": "to",
@@ -122,51 +114,65 @@
   {
     "inputs": [],
     "name": "FIELD_SIZE",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "NUMBER_OF_MINUTES",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "ROOT_HISTORY_SIZE",
-    "outputs": [{
-      "internalType": "uint32",
-      "name": "",
-      "type": "uint32"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "ZERO_VALUE",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "drawId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
         "type": "uint256"
       },
       {
@@ -180,18 +186,20 @@
         "type": "uint256"
       }
     ],
-    "name": "_triggerDrawComplete",
+    "name": "_triggerDrawEnd",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "drawId",
-      "type": "uint256"
-    }],
-    "name": "_triggerDrawEnd",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "addOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -199,38 +207,45 @@
   {
     "inputs": [],
     "name": "currentDrawId",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "currentRootIndex",
-    "outputs": [{
-      "internalType": "uint32",
-      "name": "",
-      "type": "uint32"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "denomination",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "_commitment",
         "type": "bytes32"
@@ -247,13 +262,16 @@
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "draws",
-    "outputs": [{
+    "outputs": [
+      {
         "internalType": "uint256",
         "name": "drawId",
         "type": "uint256"
@@ -269,18 +287,8 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "activeMintingPeriod",
-        "type": "uint256"
-      },
-      {
         "internalType": "bool",
         "name": "isCompleted",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "isEnded",
         "type": "bool"
       }
     ],
@@ -288,44 +296,53 @@
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "filledSubtrees",
-    "outputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{
-      "internalType": "uint256[]",
-      "name": "_poolBalance",
-      "type": "uint256[]"
-    }],
-    "name": "generateYield",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getLastRoot",
-    "outputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
+    "inputs": [],
+    "name": "getPlayers",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "_left",
         "type": "bytes32"
@@ -337,232 +354,224 @@
       }
     ],
     "name": "hashLeftRight",
-    "outputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "hasher",
-    "outputs": [{
-      "internalType": "contract IHasher",
-      "name": "",
-      "type": "address"
-    }],
+    "outputs": [
+      {
+        "internalType": "contract IHasher",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "numMinutes_",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "numMinutes_",
+        "type": "uint256"
+      }
+    ],
     "name": "initDraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "bytes32",
-      "name": "_root",
-      "type": "bytes32"
-    }],
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_root",
+        "type": "bytes32"
+      }
+    ],
     "name": "isKnownRoot",
-    "outputs": [{
-      "internalType": "bool",
-      "name": "",
-      "type": "bool"
-    }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "bytes32",
-      "name": "_nullifierHash",
-      "type": "bytes32"
-    }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      }
+    ],
+    "name": "isOwner",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_nullifierHash",
+        "type": "bytes32"
+      }
+    ],
     "name": "isSpent",
-    "outputs": [{
-      "internalType": "bool",
-      "name": "",
-      "type": "bool"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{
-      "internalType": "bytes32[]",
-      "name": "_nullifierHashes",
-      "type": "bytes32[]"
-    }],
-    "name": "isSpentArray",
-    "outputs": [{
-      "internalType": "bool[]",
-      "name": "spent",
-      "type": "bool[]"
-    }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "levels",
-    "outputs": [{
-      "internalType": "uint32",
-      "name": "",
-      "type": "uint32"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "nextIndex",
-    "outputs": [{
-      "internalType": "uint32",
-      "name": "",
-      "type": "uint32"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "name": "nullifierHashes",
-    "outputs": [{
-      "internalType": "bool",
-      "name": "",
-      "type": "bool"
-    }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "numDraws",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{
-      "internalType": "address",
-      "name": "",
-      "type": "address"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
-    "name": "players",
-    "outputs": [{
-      "internalType": "bool",
-      "name": "",
-      "type": "bool"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "playersCount",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
-    "name": "prizes",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "bound",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "bound",
+        "type": "uint256"
+      }
+    ],
     "name": "rand",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "renounceOwnership",
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_element",
+        "type": "bytes32"
+      }
+    ],
+    "name": "removeElement",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "roots",
-    "outputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "address",
-      "name": "newOwner",
-      "type": "address"
-    }],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "triggerDrawComplete",
+    "name": "triggerDrawEnd",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -570,22 +579,27 @@
   {
     "inputs": [],
     "name": "verifier",
-    "outputs": [{
-      "internalType": "contract IVerifier",
-      "name": "",
-      "type": "address"
-    }],
+    "outputs": [
+      {
+        "internalType": "contract IVerifier",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "winningTickets",
-    "outputs": [{
+    "outputs": [
+      {
         "internalType": "uint256",
         "name": "drawId",
         "type": "uint256"
@@ -604,14 +618,21 @@
         "internalType": "bool",
         "name": "isSpent",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{
-        "components": [{
+    "inputs": [
+      {
+        "components": [
+          {
             "internalType": "uint256[2]",
             "name": "a",
             "type": "uint256[2]"
@@ -663,17 +684,94 @@
     "type": "function"
   },
   {
-    "inputs": [{
-      "internalType": "uint256",
-      "name": "",
-      "type": "uint256"
-    }],
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256[2]",
+            "name": "a",
+            "type": "uint256[2]"
+          },
+          {
+            "internalType": "uint256[2][2]",
+            "name": "b",
+            "type": "uint256[2][2]"
+          },
+          {
+            "internalType": "uint256[2]",
+            "name": "c",
+            "type": "uint256[2]"
+          }
+        ],
+        "internalType": "struct Proof",
+        "name": "_proof",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_root",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_nullifierHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address payable",
+        "name": "_recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "address payable",
+        "name": "_relayer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "drawId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawWinning",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "yieldGenerator",
+    "outputs": [
+      {
+        "internalType": "contract YieldGenerator",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "zeros",
-    "outputs": [{
-      "internalType": "bytes32",
-      "name": "",
-      "type": "bytes32"
-    }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   }

@@ -1,6 +1,5 @@
 import {
   Box,
-  chakra,
   Flex,
   SimpleGrid,
   Stat,
@@ -13,7 +12,7 @@ import { BsPerson } from 'react-icons/bs'
 import { FiServer } from 'react-icons/fi'
 import { FiDollarSign } from 'react-icons/fi'
 import useZKPoolContract from '../hooks/useZkPoolContract'
-import { getAddress } from '../util';
+import { getAddress } from '../util'
 
 interface StatsCardProps {
   title: string
@@ -51,9 +50,7 @@ function StatsCard(props: StatsCardProps) {
 }
 
 export default function Statistics() {
-  const contract = useZKPoolContract(
-    getAddress(),
-  )
+  const contract = useZKPoolContract(getAddress())
 
   const [users, setUsers] = useState(0)
   const [drawsCount, setDrawsCount] = useState('0')
@@ -74,6 +71,7 @@ export default function Statistics() {
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
         <StatsCard
           title={'Users'}
+          // @ts-ignore
           stat={users}
           icon={<BsPerson size={'3em'} />}
         />

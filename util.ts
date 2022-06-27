@@ -350,5 +350,5 @@ export const isSupportedNetwork = (id: number) => {
 };
 
 export const getAddress = () => {
-  return process.env.POOL_ADDRESS;
+  return '0x3E63D95e998e78036C95200f38fcF189633764D7';
 };
