@@ -86,6 +86,25 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "Received",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "to",
         "type": "address"
       },
@@ -290,6 +309,26 @@
         "internalType": "bool",
         "name": "isCompleted",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nullifierHashIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "nullifierHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSpent",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -309,6 +348,61 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDraws",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "drawId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isCompleted",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nullifierHashIndex",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "nullifierHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bool",
+            "name": "isSpent",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct DrawManager.DrawStruct[]",
+        "name": "",
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -378,13 +472,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "numMinutes_",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "initDraw",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -592,45 +680,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "winningTickets",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "drawId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nullifierHashIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "nullifierHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bool",
-        "name": "isSpent",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
           {
             "internalType": "uint256[2]",
@@ -774,5 +823,9 @@
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]

@@ -13,7 +13,7 @@ function Home() {
       }}
       maxW="1200px"
     >
-      <Nav />
+      <Nav page={'App'} />
       <Hero />
     </Container>
   )

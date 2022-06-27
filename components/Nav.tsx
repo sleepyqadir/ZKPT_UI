@@ -33,7 +33,11 @@ const NavLink = ({ children }: { children: ReactNode }) => (
   </Link>
 )
 
-export default function Nav() {
+type NavProps = {
+  page: string
+}
+
+export default function Nav({ page }: NavProps) {
   const { colorMode, toggleColorMode } = useColorMode()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { account, library, chainId } = useWeb3React()
@@ -50,7 +54,9 @@ export default function Nav() {
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={7}>
               {typeof account === 'string' && chainId === 4 && (
-                <Button onClick={() => router.push('/draws')}>Draws</Button>
+                <Button onClick={() => router.push(`/${page.toLowerCase()}`)}>
+                  {page}
+                </Button>
               )}
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}

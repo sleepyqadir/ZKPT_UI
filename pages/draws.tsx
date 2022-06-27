@@ -4,13 +4,7 @@ import PackageTier from '../components/PackageTier'
 import Statistics from '../components/Statistics'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useState, useEffect } from 'react'
-import { getAddress } from '../util';
-
-const options = [
-  { id: 1, desc: 'Minting Period' },
-  { id: 2, desc: 'Winner Seclected' },
-  { id: 3, desc: 'Completed' },
-]
+import { getAddress } from '../util'
 
 function Draw() {
   const contract = useZKPoolContract(getAddress())
@@ -18,13 +12,9 @@ function Draw() {
   const [draws, setDraws] = useState([])
 
   const getStats = async () => {
-    const drawCount = await contract.numDraws()
-    const drawsArray = []
-    for (let index = 0; index < parseInt(drawCount.toString()); index++) {
-      const draw = await contract.draws(index)
-      drawsArray.push(draw)
-    }
-    console.log({ draws: drawsArray })
+    const draws = await contract.getDraws()
+    console.log('========>', draws[2].nullifierHashIndex.toString())
+    setDraws(draws)
   }
 
   useEffect(() => {
@@ -40,7 +30,7 @@ function Draw() {
       }}
       maxW="1200px"
     >
-      <Nav />
+      <Nav page={'App'} />
       <Statistics />
       <Box py={6} px={5} style={{ minHeight: '100vh' }}>
         <Stack spacing={4} width={'100%'} direction={'column'}>
@@ -64,7 +54,7 @@ function Draw() {
               textAlign={'center'}
             >
               <Heading size={'lg'}>
-                The Right Plan for <Text color="purple.400">Your Savings</Text>
+                The Right Plan for <Text color="#fc6643">Your Savings</Text>
               </Heading>
             </Stack>
             <Stack
@@ -80,14 +70,55 @@ function Draw() {
               </Text>
             </Stack>
           </Stack>
+          <Divider />
+          <Stack
+            style={{ marginRight: '75px' }}
+            justifyContent={{
+              base: 'flex-start',
+              md: 'space-around',
+            }}
+            direction={{
+              base: 'column',
+              md: 'row',
+            }}
+          >
+            <Heading size={'md'}>DRAWS</Heading>
+            <Heading size={'md'}>STATUS</Heading>
+            <Heading size={'md'}>TICKET PRIZE</Heading>
+            <Heading size={'md'}>CHECK</Heading>
+          </Stack>
           {draws.map((draw) => {
             return (
               <>
                 <Divider />
                 <PackageTier
-                  title={'Draw 1'}
+                  title={draw.drawId.toString()}
+                  drawNullifier={draw.nullifierHash}
+                  isSpent={draw.isSpent}
+                  winnerSelected={
+                    draw.nullifierHash ===
+                    '0x0000000000000000000000000000000000000000000000000000000000000000'
+                      ? false
+                      : true
+                  }
                   typePlan="0.1 ETH"
-                  options={options}
+                  options={[
+                    { id: 1, desc: 'Spent', status: draw.isSpent },
+                    {
+                      id: 2,
+                      desc: 'Winner Seclected',
+                      status:
+                        draw.nullifierHash ===
+                        '0x0000000000000000000000000000000000000000000000000000000000000000'
+                          ? false
+                          : true,
+                    },
+                    {
+                      id: 3,
+                      desc: 'Completed',
+                      status: draw.isCompleted,
+                    },
+                  ]}
                 />
               </>
             )

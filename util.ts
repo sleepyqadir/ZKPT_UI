@@ -23,13 +23,6 @@ export function shortenHex(hex: string, length = 4) {
   )}`;
 }
 
-export const toHex = (number, length = 32) =>
-  '0x' +
-  (number instanceof Buffer
-    ? number.toString('hex')
-    : BigInt(number).toString(16)
-  ).padStart(length * 2, '0');
-
 const ETHERSCAN_PREFIXES = {
   1: '',
   3: 'ropsten.',
@@ -50,7 +43,7 @@ export const createDeposit = async (
 export const generateNote = async (deposit: Deposit) => {
   const AMOUNT = '0.1';
   const netId = '4';
-  return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}-0x${deposit.secret}`;
+  return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}0x${deposit.secret}`;
 };
 
 export const parseNote = async (noteString) => {
@@ -58,7 +51,6 @@ export const parseNote = async (noteString) => {
     const noteArray = noteString.split('0x');
     const noteRegex = /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)/g;
     const match = noteRegex.exec(noteArray[0]);
-
     const bytesArrayNullifier = noteArray[1].split(',').map((x) => +x);
     const nullifier = new Uint8Array(bytesArrayNullifier);
     const bytesArraySecret = noteArray[2].split(',').map((x) => +x);
@@ -85,7 +77,6 @@ export const poseidonHash = (poseidon: any, inputs: BigNumberish[]) => {
 };
 
 const generateMerkleProof = async (deposit, contract: Pool) => {
-  console.log('Getting contract state...');
   const eventFilter = contract.filters.Deposit();
   const events = await contract.queryFilter(eventFilter, 0, 'latest');
   const poseidon = await circomlibjs.buildPoseidon();
@@ -170,16 +161,12 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
         message: 'the selected network is not supported yet try [rinkeby]',
       };
     } else {
-      console.log('Sending deposit transaction...');
       const commitment = deposit.commitment;
       const nullifierHash = deposit.nullifierHash;
       const tx = await contract.deposit(commitment, nullifierHash, {
         value: ethers.utils.parseEther('0.1'),
       });
       const txReceipt = await tx.wait();
-      console.log(
-        `https://rinkeby.etherscan.io/tx/${txReceipt.transactionHash}`
-      );
       return {
         type: 'success',
         title: 'Transaction Success',
@@ -198,7 +185,6 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
 export const withdraw = async (note, recipient, contract: Pool) => {
   try {
     const deposit = await parseNote(note);
-    console.log('deposit created ====>', { deposit });
     if (!deposit) {
       return {
         type: 'error',
@@ -211,14 +197,13 @@ export const withdraw = async (note, recipient, contract: Pool) => {
       deposit,
       recipient,
       contract,
-      process.env.RELAYER_ADDRESS
+      '0x99d667ff3e5891a5f40288cb94276158ae8176a0'
     );
 
     if (!snarkProof.proof) {
       return snarkProof;
     }
 
-    console.log('Sending withdrawal transaction...');
     console.log({ proof: snarkProof.proof, args: snarkProof.args });
     const response = await fetch(`/api/withdraw/`, {
       method: 'POST',
@@ -230,12 +215,72 @@ export const withdraw = async (note, recipient, contract: Pool) => {
         args: snarkProof.args,
       }),
     });
-    console.log({ response });
+
+    const txResponse = await response.json();
 
     return {
       type: 'success',
       title: 'Transaction Success',
-      message: `https://rinkeby.etherscan.io/tx/`,
+      message: `https://rinkeby.etherscan.io/tx/${txResponse.transactionHash}`,
+    };
+  } catch (err) {
+    console.log('error while withdrawing', { err });
+    return {
+      type: 'error',
+      title: 'Something went wrong',
+      message: err.message,
+    };
+  }
+};
+
+export const withdrawWinning = async (
+  drawId,
+  note,
+  recipient,
+  contract: Pool
+) => {
+  try {
+    const deposit = await parseNote(note);
+    if (!deposit) {
+      return {
+        type: 'error',
+        title: 'Invalid Note formet',
+        message:
+          'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
+      };
+    }
+    const snarkProof = await generateSnarkProof(
+      deposit,
+      recipient,
+      contract,
+      '0x99d667ff3e5891a5f40288cb94276158ae8176a0'
+    );
+
+    if (!snarkProof.proof) {
+      return snarkProof;
+    }
+
+    console.log({ proof: snarkProof.proof, args: snarkProof.args });
+    snarkProof.args.push(drawId);
+    console.log(snarkProof.args);
+    const response = await fetch(`/api/withdrawWinning/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        proof: snarkProof.proof,
+        args: snarkProof.args,
+      }),
+    });
+
+    const txResponse = await response.json();
+
+    return {
+      type: 'success',
+      title: 'Transaction Success',
+      // @ts-ignore
+      message: `https://rinkeby.etherscan.io/tx/${response.transactionHash}`,
     };
   } catch (err) {
     console.log('error while withdrawing', { err });
@@ -286,8 +331,6 @@ const generateSnarkProof = async (
 
   const response = await generateMerkleProof(deposit, contract);
 
-  console.log({ response });
-
   if (response.type) {
     return { ...response };
   }
@@ -307,6 +350,8 @@ const generateSnarkProof = async (
     pathElements: path_elements,
     pathIndices: path_index,
   };
+
+  console.log({ witness });
 
   const solidityProof = await prove(witness);
 
@@ -350,5 +395,32 @@ export const isSupportedNetwork = (id: number) => {
 };
 
 export const getAddress = () => {
-  return '0x3E63D95e998e78036C95200f38fcF189633764D7';
+  return '0x2442195C16d7b892E4f66A8Be107C525c825613c';
+};
+
+export const checkNullifier = async (note: string, drawNullifier: any) => {
+  const deposit = await parseNote(note);
+  console.log({ deposit });
+  console.log('nullifier hash ======>', deposit.nullifierHash, drawNullifier);
+  if (!deposit) {
+    return {
+      type: 'error',
+      title: 'Invalid Note formet',
+      message:
+        'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
+    };
+  }
+  if (deposit.nullifierHash === drawNullifier) {
+    return {
+      type: 'eligibility',
+      title: 'You have won the draw',
+      status: true,
+    };
+  } else {
+    return {
+      type: 'eligibility',
+      title: "Sorry you haven't won this draw try another note",
+      status: false,
+    };
+  }
 };

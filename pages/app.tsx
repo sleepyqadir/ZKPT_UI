@@ -66,7 +66,7 @@ function App() {
     onClose: onIsAlertClose,
   } = useDisclosure()
   const contract = useZKPoolContract(getAddress())
-  const { chainId, account } = useWeb3React()
+  const { chainId, account, library } = useWeb3React()
   const [note, setNote] = useState('')
   const [deposit, setDeposit] = useState(null)
   const [withdrawAddress, setWithdrawAddress] = useState('')
@@ -79,11 +79,9 @@ function App() {
 
   const onWithdraw = async () => {
     try {
-      console.log({ withdrawAddress, withdrawNote, contract })
       if (!ethers.utils.isAddress(withdrawAddress)) {
         setWithdrawLoader(false)
         setIsAddressError(true)
-        console.log('=============>Invalid Address Formet')
         return
       }
       const alert = await withdraw(withdrawNote, withdrawAddress, contract)
@@ -140,7 +138,7 @@ function App() {
       }}
       maxW="1200px"
     >
-      <Nav />
+      <Nav page={'Draws'} />
       <Grid
         templateColumns="repeat(2, 1fr)"
         gap={20}

@@ -1,32 +1,50 @@
-import { CheckIcon } from '@chakra-ui/icons'
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
+import { useRef, useState } from 'react'
+import { checkNullifier } from '../util'
 import {
   Button,
+  FormControl,
+  FormHelperText,
   Heading,
+  Input,
   List,
   ListIcon,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Stack,
   useColorModeValue,
+  useDisclosure,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 
 interface PackageTierProps {
   title: string
-  options: Array<{ id: number; desc: string }>
+  options: Array<{ id: number; desc: string; status: boolean }>
   typePlan: string
   checked?: boolean
+  winnerSelected: boolean
+  drawNullifier: any
+  isSpent: boolean
 }
 
 const PackageTier = ({
   title,
   options,
   typePlan,
+  winnerSelected,
   checked = false,
+  isSpent,
+  drawNullifier,
 }: PackageTierProps) => {
-  const colorTextLight = checked ? 'white' : 'purple.600'
-  const bgColorLight = checked ? 'purple.400' : 'gray.300'
-
-  const colorTextDark = checked ? 'white' : 'purple.500'
-  const bgColorDark = checked ? 'purple.400' : 'gray.300'
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const finalRef = useRef(null)
+  const router = useRouter()
 
   return (
     <Stack
@@ -42,11 +60,15 @@ const PackageTier = ({
       }}
       alignItems={{ md: 'center' }}
     >
-      <Heading size={'md'}>{title}</Heading>
+      <Heading size={'md'}>Draw: {title}</Heading>
       <List spacing={3} textAlign="start">
         {options.map((desc, id) => (
           <ListItem key={desc.id}>
-            <ListIcon as={CheckIcon} color="green.500" />
+            {desc.status ? (
+              <ListIcon as={CheckIcon} color="green.500" />
+            ) : (
+              <ListIcon as={CloseIcon} color="red.500" />
+            )}
             {desc.desc}
           </ListItem>
         ))}
@@ -55,10 +77,25 @@ const PackageTier = ({
       <Stack>
         <Button
           size="md"
-          color={useColorModeValue(colorTextLight, colorTextDark)}
-          bgColor={useColorModeValue(bgColorLight, bgColorDark)}
+          colorScheme={'orange'}
+          bg={'#fc6643'}
+          px={6}
+          _hover={{
+            bg: 'white.390',
+          }}
+          disabled={!winnerSelected || isSpent}
+          onClick={() => {
+            router.push({
+              pathname: '/check',
+              query: { drawNullifier: drawNullifier, title },
+            })
+          }}
         >
-          Buy Ticket
+          {isSpent
+            ? 'Already Spent'
+            : !winnerSelected
+            ? 'In Progress'
+            : 'Check'}
         </Button>
       </Stack>
     </Stack>

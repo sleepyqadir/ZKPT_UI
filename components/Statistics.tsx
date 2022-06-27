@@ -82,7 +82,8 @@ export default function Statistics() {
         />
         <StatsCard
           title={'Total Winning'}
-          stat={'7'}
+          // @ts-ignore
+          stat={drawsCount * 0.001}
           icon={<FiDollarSign size={'3em'} />}
         />
       </SimpleGrid>

@@ -21,11 +21,14 @@ export default async (req, res) => {
   const {
     body: { proof, args },
   } = req;
+  try {
+    const contract = new Contract(getAddress(), POOL_ABI, signer);
 
-  const contract = new Contract(getAddress(), POOL_ABI, signer);
-
-  const tx = await contract.withdraw(proof, ...args, {});
-  const txReciept = await tx.wait();
-  console.log({ txReciept });
-  res.json(txReciept);
+    const tx = await contract.withdrawWinning(proof, ...args, {});
+    const txReciept = await tx.wait();
+    console.log({ txReciept });
+    res.json(txReciept);
+  } catch (err) {
+    res.json(err);
+  }
 };
