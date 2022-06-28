@@ -2,6 +2,78 @@
 
 This is a default [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), customized as the default boilerplate for new Web3 projects.
 
+
+## Folder Structure
+
+```bash
+.
+├── classes
+│   ├── deposit.ts
+│   ├── merkleTree.ts
+│   └── PoseidonHasher.ts
+├── components
+│   ├── Account.tsx
+│   ├── ETHBalance.tsx
+│   ├── Hero.tsx
+│   ├── Nav.tsx
+│   ├── Network.tsx
+│   ├── PackageTier.tsx
+│   └── Statistics.tsx
+├── connectors.ts
+├── contracts
+│   ├── Pool.json
+│   └── types
+│       ├── common.d.ts
+│       ├── DrawManager.d.ts
+│       ├── hardhat.d.ts
+│       ├── IHasher.d.ts
+│       ├── index.ts
+│       ├── IVerifier.d.ts
+│       ├── MerkleTreeWithHistory.d.ts
+│       ├── MerkleTreeWithHistoryMock.d.ts
+│       ├── Ownable.d.ts
+│       ├── Pool.d.ts
+│       ├── Verifier.d.ts
+│       └── YieldGenerator.d.ts
+├── getLibrary.ts
+├── hooks
+│   ├── useBlockNumber.ts
+│   ├── useContract.ts
+│   ├── useEagerConnect.ts
+│   ├── useENSName.ts
+│   ├── useETHBalance.ts
+│   ├── useKeepSWRDataLiveAsBlocksArrive.ts
+│   ├── useMetaMaskOnboarding.ts
+│   └── useZkPoolContract.ts
+├── next.config.js
+├── next-env.d.ts
+├── package.json
+├── package-lock.json
+├── pages
+│   ├── api
+│   │   ├── withdraw.ts
+│   │   └── withdrawWinning.ts
+│   ├── _app.tsx
+│   ├── app.tsx
+│   ├── check.tsx
+│   ├── draws.tsx
+│   └── index.tsx
+├── public
+│   ├── circuit_final.zkey
+│   ├── favicon.ico
+│   ├── images
+│   │   ├── background3.jpg
+│   │   └── background.png
+│   └── withdraw.wasm
+├── README.md
+├── styles
+│   └── globals.css
+├── tsconfig.json
+├── util.ts
+└── yarn.lock
+
+```
+
 ## Features
 
 - Separate packages from [ethers.js](https://docs.ethers.io/v5/) for improved tree-shaking, often only ethers Contracts
