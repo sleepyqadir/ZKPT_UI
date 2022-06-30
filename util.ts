@@ -25,10 +25,10 @@ export function shortenHex(hex: string, length = 4) {
 
 const ETHERSCAN_PREFIXES = {
   1: '',
-  3: 'ropsten.',
-  4: 'rinkeby.',
-  5: 'goerli.',
-  42: 'kovan.',
+  3: 'ropsten',
+  4: 'rinkeby',
+  5: 'goerli',
+  42: 'kovan',
 };
 
 export const createDeposit = async (
@@ -380,13 +380,13 @@ export const getNetwork = (id: number) => {
   return networks[id];
 };
 
-export const isSupportedNetwork = (id: number) => {
+export const isSupportedNetwork = (id: number): boolean => {
   const networks = {
     1: false,
     3: false,
     4: true,
     5: false,
-    137: false,
+    137: true,
     1666600000: false,
     1666900000: false,
   };
@@ -422,5 +422,15 @@ export const checkNullifier = async (note: string, drawNullifier: any) => {
       title: "Sorry you haven't won this draw try another note",
       status: false,
     };
+  }
+};
+
+export const switchNetwork = (mainnet: boolean) => {
+  if (mainnet) {
+    window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x89' }],
+    });
+  } else {
   }
 };

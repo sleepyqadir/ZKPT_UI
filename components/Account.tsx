@@ -4,8 +4,13 @@ import { useEffect, useState } from 'react'
 import { injected } from '../connectors'
 import useENSName from '../hooks/useENSName'
 import useMetaMaskOnboarding from '../hooks/useMetaMaskOnboarding'
-import { formatEtherscanLink, shortenHex } from '../util'
-import { Button } from '@chakra-ui/react'
+import {
+  formatEtherscanLink,
+  isSupportedNetwork,
+  shortenHex,
+  switchNetwork,
+} from '../util'
+import { Button, Icon } from '@chakra-ui/react'
 type AccountProps = {
   triedToEagerConnect: boolean
 }
@@ -32,7 +37,25 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
   const ENSName = useENSName(account)
 
   if (error) {
-    return null
+    return (
+      <Button
+        onClick={() => {
+          switchNetwork(true)
+        }}
+      >
+        <Icon
+          viewBox="0 0 200 200"
+          color="red.500"
+          style={{ marginRight: '10px' }}
+        >
+          <path
+            fill="currentColor"
+            d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+          />
+        </Icon>
+        Switch Network
+      </Button>
+    )
   }
 
   if (!triedToEagerConnect) {
@@ -52,6 +75,7 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
                 // ignore the error if it's a user rejected request
                 if (error instanceof UserRejectedRequestError) {
                   setConnecting(false)
+                  switchNetwork(true)
                 } else {
                   setError(error)
                 }
