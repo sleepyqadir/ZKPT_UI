@@ -28,35 +28,15 @@ import type {
   PromiseOrValue,
 } from "./common";
 
-export type ProofStruct = {
-  a: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
-  b: [
-    [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-    [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
-  ];
-  c: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
-};
-
-export type ProofStructOutput = [
-  [BigNumber, BigNumber],
-  [[BigNumber, BigNumber], [BigNumber, BigNumber]],
-  [BigNumber, BigNumber]
-] & {
-  a: [BigNumber, BigNumber];
-  b: [[BigNumber, BigNumber], [BigNumber, BigNumber]];
-  c: [BigNumber, BigNumber];
-};
-
 export declare namespace DrawManager {
   export type DrawStructStruct = {
     drawId: PromiseOrValue<BigNumberish>;
     startTime: PromiseOrValue<BigNumberish>;
     endTime: PromiseOrValue<BigNumberish>;
     isCompleted: PromiseOrValue<boolean>;
-    nullifierHashIndex: PromiseOrValue<BigNumberish>;
-    nullifierHash: PromiseOrValue<BytesLike>;
     isSpent: PromiseOrValue<boolean>;
     amount: PromiseOrValue<BigNumberish>;
+    random: PromiseOrValue<BigNumberish>;
   };
 
   export type DrawStructStructOutput = [
@@ -64,19 +44,38 @@ export declare namespace DrawManager {
     BigNumber,
     BigNumber,
     boolean,
-    BigNumber,
-    string,
     boolean,
+    BigNumber,
     BigNumber
   ] & {
     drawId: BigNumber;
     startTime: BigNumber;
     endTime: BigNumber;
     isCompleted: boolean;
-    nullifierHashIndex: BigNumber;
-    nullifierHash: string;
     isSpent: boolean;
     amount: BigNumber;
+    random: BigNumber;
+  };
+}
+
+export declare namespace Pool {
+  export type ProofStruct = {
+    a: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
+    b: [
+      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
+      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    ];
+    c: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
+  };
+
+  export type ProofStructOutput = [
+    [BigNumber, BigNumber],
+    [[BigNumber, BigNumber], [BigNumber, BigNumber]],
+    [BigNumber, BigNumber]
+  ] & {
+    a: [BigNumber, BigNumber];
+    b: [[BigNumber, BigNumber], [BigNumber, BigNumber]];
+    c: [BigNumber, BigNumber];
   };
 }
 
@@ -85,37 +84,36 @@ export interface PoolInterface extends utils.Interface {
     "FIELD_SIZE()": FunctionFragment;
     "NUMBER_OF_MINUTES()": FunctionFragment;
     "ROOT_HISTORY_SIZE()": FunctionFragment;
+    "WETH()": FunctionFragment;
     "ZERO_VALUE()": FunctionFragment;
-    "_triggerDrawEnd(uint256,uint256,bytes32,uint256)": FunctionFragment;
-    "addOwnership(address)": FunctionFragment;
+    "_triggerDrawEnd(uint256,uint256)": FunctionFragment;
     "currentDrawId()": FunctionFragment;
     "currentRootIndex()": FunctionFragment;
     "denomination()": FunctionFragment;
-    "deposit(bytes32,bytes32)": FunctionFragment;
+    "deposit(bytes32)": FunctionFragment;
     "draws(uint256)": FunctionFragment;
     "filledSubtrees(uint256)": FunctionFragment;
     "getDraws()": FunctionFragment;
     "getLastRoot()": FunctionFragment;
-    "getPlayers()": FunctionFragment;
     "hashLeftRight(bytes32,bytes32)": FunctionFragment;
     "hasher()": FunctionFragment;
-    "initDraw()": FunctionFragment;
+    "initDraw(uint256)": FunctionFragment;
     "isKnownRoot(bytes32)": FunctionFragment;
-    "isOwner(address)": FunctionFragment;
     "isSpent(bytes32)": FunctionFragment;
     "levels()": FunctionFragment;
     "nextIndex()": FunctionFragment;
     "nullifierHashes(bytes32)": FunctionFragment;
-    "numDraws()": FunctionFragment;
-    "playersCount()": FunctionFragment;
-    "rand(uint256)": FunctionFragment;
-    "removeElement(bytes32)": FunctionFragment;
+    "owner()": FunctionFragment;
+    "random(uint256)": FunctionFragment;
+    "renounceOwnership()": FunctionFragment;
     "roots(uint256)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
     "triggerDrawEnd()": FunctionFragment;
-    "verifier()": FunctionFragment;
-    "withdraw((uint256[2],uint256[2][2],uint256[2]),bytes32,bytes32,address,address,uint256)": FunctionFragment;
-    "withdrawWinning((uint256[2],uint256[2][2],uint256[2]),bytes32,bytes32,address,address,uint256,uint256)": FunctionFragment;
-    "yieldGenerator()": FunctionFragment;
+    "wethGateway()": FunctionFragment;
+    "winning((uint256[2],uint256[2][2],uint256[2]),bytes32,bytes32,address,address,uint256,uint256)": FunctionFragment;
+    "winningVerifier()": FunctionFragment;
+    "withdraw((uint256[2],uint256[2][2],uint256[2]),bytes32,bytes32,address,address,uint256,uint256)": FunctionFragment;
+    "withdrawVerifier()": FunctionFragment;
     "zeros(uint256)": FunctionFragment;
   };
 
@@ -124,9 +122,9 @@ export interface PoolInterface extends utils.Interface {
       | "FIELD_SIZE"
       | "NUMBER_OF_MINUTES"
       | "ROOT_HISTORY_SIZE"
+      | "WETH"
       | "ZERO_VALUE"
       | "_triggerDrawEnd"
-      | "addOwnership"
       | "currentDrawId"
       | "currentRootIndex"
       | "denomination"
@@ -135,26 +133,25 @@ export interface PoolInterface extends utils.Interface {
       | "filledSubtrees"
       | "getDraws"
       | "getLastRoot"
-      | "getPlayers"
       | "hashLeftRight"
       | "hasher"
       | "initDraw"
       | "isKnownRoot"
-      | "isOwner"
       | "isSpent"
       | "levels"
       | "nextIndex"
       | "nullifierHashes"
-      | "numDraws"
-      | "playersCount"
-      | "rand"
-      | "removeElement"
+      | "owner"
+      | "random"
+      | "renounceOwnership"
       | "roots"
+      | "transferOwnership"
       | "triggerDrawEnd"
-      | "verifier"
+      | "wethGateway"
+      | "winning"
+      | "winningVerifier"
       | "withdraw"
-      | "withdrawWinning"
-      | "yieldGenerator"
+      | "withdrawVerifier"
       | "zeros"
   ): FunctionFragment;
 
@@ -170,22 +167,14 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "ROOT_HISTORY_SIZE",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ZERO_VALUE",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "_triggerDrawEnd",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "addOwnership",
-    values: [PromiseOrValue<string>]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "currentDrawId",
@@ -201,7 +190,7 @@ export interface PoolInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "draws",
@@ -217,22 +206,17 @@ export interface PoolInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getPlayers",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "hashLeftRight",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(functionFragment: "hasher", values?: undefined): string;
-  encodeFunctionData(functionFragment: "initDraw", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "initDraw",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
   encodeFunctionData(
     functionFragment: "isKnownRoot",
     values: [PromiseOrValue<BytesLike>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isOwner",
-    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "isSpent",
@@ -244,43 +228,35 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "nullifierHashes",
     values: [PromiseOrValue<BytesLike>]
   ): string;
-  encodeFunctionData(functionFragment: "numDraws", values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "playersCount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "rand",
+    functionFragment: "random",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "removeElement",
-    values: [PromiseOrValue<BytesLike>]
+    functionFragment: "renounceOwnership",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "roots",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "triggerDrawEnd",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "verifier", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "withdraw",
-    values: [
-      ProofStruct,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
-    ]
+    functionFragment: "wethGateway",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "withdrawWinning",
+    functionFragment: "winning",
     values: [
-      ProofStruct,
+      Pool.ProofStruct,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BytesLike>,
       PromiseOrValue<string>,
@@ -290,7 +266,23 @@ export interface PoolInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "yieldGenerator",
+    functionFragment: "winningVerifier",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [
+      Pool.ProofStruct,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawVerifier",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -307,13 +299,10 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "ROOT_HISTORY_SIZE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ZERO_VALUE", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "_triggerDrawEnd",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "addOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -339,7 +328,6 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "getLastRoot",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getPlayers", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "hashLeftRight",
     data: BytesLike
@@ -350,7 +338,6 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "isKnownRoot",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isSpent", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "levels", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nextIndex", data: BytesLike): Result;
@@ -358,29 +345,33 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "nullifierHashes",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "numDraws", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "random", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "playersCount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "rand", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "removeElement",
+    functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "roots", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "triggerDrawEnd",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "verifier", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawWinning",
+    functionFragment: "wethGateway",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "winning", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "yieldGenerator",
+    functionFragment: "winningVerifier",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawVerifier",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "zeros", data: BytesLike): Result;
@@ -388,12 +379,14 @@ export interface PoolInterface extends utils.Interface {
   events: {
     "Deposit(bytes32,uint32,uint256)": EventFragment;
     "LogNewLottery(address,uint256,uint256)": EventFragment;
+    "OwnershipTransferred(address,address)": EventFragment;
     "Received(address,uint256)": EventFragment;
     "Withdrawal(address,bytes32,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogNewLottery"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
 }
@@ -421,6 +414,18 @@ export type LogNewLotteryEvent = TypedEvent<
 >;
 
 export type LogNewLotteryEventFilter = TypedEventFilter<LogNewLotteryEvent>;
+
+export interface OwnershipTransferredEventObject {
+  previousOwner: string;
+  newOwner: string;
+}
+export type OwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  OwnershipTransferredEventObject
+>;
+
+export type OwnershipTransferredEventFilter =
+  TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface ReceivedEventObject {
   arg0: string;
@@ -479,18 +484,13 @@ export interface Pool extends BaseContract {
 
     ROOT_HISTORY_SIZE(overrides?: CallOverrides): Promise<[number]>;
 
+    WETH(overrides?: CallOverrides): Promise<[string]>;
+
     ZERO_VALUE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     _triggerDrawEnd(
       drawId: PromiseOrValue<BigNumberish>,
-      amount: PromiseOrValue<BigNumberish>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      random: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    addOwnership(
-      newOwner: PromiseOrValue<string>,
+      index: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -502,7 +502,6 @@ export interface Pool extends BaseContract {
 
     deposit(
       _commitment: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -515,19 +514,17 @@ export interface Pool extends BaseContract {
         BigNumber,
         BigNumber,
         boolean,
-        BigNumber,
-        string,
         boolean,
+        BigNumber,
         BigNumber
       ] & {
         drawId: BigNumber;
         startTime: BigNumber;
         endTime: BigNumber;
         isCompleted: boolean;
-        nullifierHashIndex: BigNumber;
-        nullifierHash: string;
         isSpent: boolean;
         amount: BigNumber;
+        random: BigNumber;
       }
     >;
 
@@ -542,8 +539,6 @@ export interface Pool extends BaseContract {
 
     getLastRoot(overrides?: CallOverrides): Promise<[string]>;
 
-    getPlayers(overrides?: CallOverrides): Promise<[string[]]>;
-
     hashLeftRight(
       _left: PromiseOrValue<BytesLike>,
       _right: PromiseOrValue<BytesLike>,
@@ -553,16 +548,12 @@ export interface Pool extends BaseContract {
     hasher(overrides?: CallOverrides): Promise<[string]>;
 
     initDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isOwner(
-      _address: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -580,17 +571,14 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    numDraws(overrides?: CallOverrides): Promise<[BigNumber]>;
+    owner(overrides?: CallOverrides): Promise<[string]>;
 
-    playersCount(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    rand(
+    random(
       bound: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    removeElement(
-      _element: PromiseOrValue<BytesLike>,
+    renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -599,34 +587,42 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     triggerDrawEnd(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    verifier(overrides?: CallOverrides): Promise<[string]>;
+    wethGateway(overrides?: CallOverrides): Promise<[string]>;
+
+    winning(
+      _proof: Pool.ProofStruct,
+      _root: PromiseOrValue<BytesLike>,
+      _nullifierHash: PromiseOrValue<BytesLike>,
+      _recipient: PromiseOrValue<string>,
+      _relayer: PromiseOrValue<string>,
+      _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    winningVerifier(overrides?: CallOverrides): Promise<[string]>;
 
     withdraw(
-      _proof: ProofStruct,
+      _proof: Pool.ProofStruct,
       _root: PromiseOrValue<BytesLike>,
       _nullifierHash: PromiseOrValue<BytesLike>,
       _recipient: PromiseOrValue<string>,
       _relayer: PromiseOrValue<string>,
       _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    withdrawWinning(
-      _proof: ProofStruct,
-      _root: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      _recipient: PromiseOrValue<string>,
-      _relayer: PromiseOrValue<string>,
-      _fee: PromiseOrValue<BigNumberish>,
-      drawId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    yieldGenerator(overrides?: CallOverrides): Promise<[string]>;
+    withdrawVerifier(overrides?: CallOverrides): Promise<[string]>;
 
     zeros(
       arg0: PromiseOrValue<BigNumberish>,
@@ -640,18 +636,13 @@ export interface Pool extends BaseContract {
 
   ROOT_HISTORY_SIZE(overrides?: CallOverrides): Promise<number>;
 
+  WETH(overrides?: CallOverrides): Promise<string>;
+
   ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
   _triggerDrawEnd(
     drawId: PromiseOrValue<BigNumberish>,
-    amount: PromiseOrValue<BigNumberish>,
-    _nullifierHash: PromiseOrValue<BytesLike>,
-    random: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  addOwnership(
-    newOwner: PromiseOrValue<string>,
+    index: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -663,7 +654,6 @@ export interface Pool extends BaseContract {
 
   deposit(
     _commitment: PromiseOrValue<BytesLike>,
-    _nullifierHash: PromiseOrValue<BytesLike>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -676,19 +666,17 @@ export interface Pool extends BaseContract {
       BigNumber,
       BigNumber,
       boolean,
-      BigNumber,
-      string,
       boolean,
+      BigNumber,
       BigNumber
     ] & {
       drawId: BigNumber;
       startTime: BigNumber;
       endTime: BigNumber;
       isCompleted: boolean;
-      nullifierHashIndex: BigNumber;
-      nullifierHash: string;
       isSpent: boolean;
       amount: BigNumber;
+      random: BigNumber;
     }
   >;
 
@@ -703,8 +691,6 @@ export interface Pool extends BaseContract {
 
   getLastRoot(overrides?: CallOverrides): Promise<string>;
 
-  getPlayers(overrides?: CallOverrides): Promise<string[]>;
-
   hashLeftRight(
     _left: PromiseOrValue<BytesLike>,
     _right: PromiseOrValue<BytesLike>,
@@ -714,16 +700,12 @@ export interface Pool extends BaseContract {
   hasher(overrides?: CallOverrides): Promise<string>;
 
   initDraw(
+    _minutes: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   isKnownRoot(
     _root: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isOwner(
-    _address: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -741,17 +723,14 @@ export interface Pool extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  numDraws(overrides?: CallOverrides): Promise<BigNumber>;
+  owner(overrides?: CallOverrides): Promise<string>;
 
-  playersCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-  rand(
+  random(
     bound: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  removeElement(
-    _element: PromiseOrValue<BytesLike>,
+  renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -760,34 +739,42 @@ export interface Pool extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  transferOwnership(
+    newOwner: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   triggerDrawEnd(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  verifier(overrides?: CallOverrides): Promise<string>;
+  wethGateway(overrides?: CallOverrides): Promise<string>;
+
+  winning(
+    _proof: Pool.ProofStruct,
+    _root: PromiseOrValue<BytesLike>,
+    _nullifierHash: PromiseOrValue<BytesLike>,
+    _recipient: PromiseOrValue<string>,
+    _relayer: PromiseOrValue<string>,
+    _fee: PromiseOrValue<BigNumberish>,
+    _drawId: PromiseOrValue<BigNumberish>,
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  winningVerifier(overrides?: CallOverrides): Promise<string>;
 
   withdraw(
-    _proof: ProofStruct,
+    _proof: Pool.ProofStruct,
     _root: PromiseOrValue<BytesLike>,
     _nullifierHash: PromiseOrValue<BytesLike>,
     _recipient: PromiseOrValue<string>,
     _relayer: PromiseOrValue<string>,
     _fee: PromiseOrValue<BigNumberish>,
+    _drawId: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  withdrawWinning(
-    _proof: ProofStruct,
-    _root: PromiseOrValue<BytesLike>,
-    _nullifierHash: PromiseOrValue<BytesLike>,
-    _recipient: PromiseOrValue<string>,
-    _relayer: PromiseOrValue<string>,
-    _fee: PromiseOrValue<BigNumberish>,
-    drawId: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  yieldGenerator(overrides?: CallOverrides): Promise<string>;
+  withdrawVerifier(overrides?: CallOverrides): Promise<string>;
 
   zeros(
     arg0: PromiseOrValue<BigNumberish>,
@@ -801,18 +788,13 @@ export interface Pool extends BaseContract {
 
     ROOT_HISTORY_SIZE(overrides?: CallOverrides): Promise<number>;
 
+    WETH(overrides?: CallOverrides): Promise<string>;
+
     ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
     _triggerDrawEnd(
       drawId: PromiseOrValue<BigNumberish>,
-      amount: PromiseOrValue<BigNumberish>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      random: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    addOwnership(
-      newOwner: PromiseOrValue<string>,
+      index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -824,7 +806,6 @@ export interface Pool extends BaseContract {
 
     deposit(
       _commitment: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -837,19 +818,17 @@ export interface Pool extends BaseContract {
         BigNumber,
         BigNumber,
         boolean,
-        BigNumber,
-        string,
         boolean,
+        BigNumber,
         BigNumber
       ] & {
         drawId: BigNumber;
         startTime: BigNumber;
         endTime: BigNumber;
         isCompleted: boolean;
-        nullifierHashIndex: BigNumber;
-        nullifierHash: string;
         isSpent: boolean;
         amount: BigNumber;
+        random: BigNumber;
       }
     >;
 
@@ -864,8 +843,6 @@ export interface Pool extends BaseContract {
 
     getLastRoot(overrides?: CallOverrides): Promise<string>;
 
-    getPlayers(overrides?: CallOverrides): Promise<string[]>;
-
     hashLeftRight(
       _left: PromiseOrValue<BytesLike>,
       _right: PromiseOrValue<BytesLike>,
@@ -874,15 +851,13 @@ export interface Pool extends BaseContract {
 
     hasher(overrides?: CallOverrides): Promise<string>;
 
-    initDraw(overrides?: CallOverrides): Promise<void>;
+    initDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isOwner(
-      _address: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -900,51 +875,54 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    numDraws(overrides?: CallOverrides): Promise<BigNumber>;
+    owner(overrides?: CallOverrides): Promise<string>;
 
-    playersCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    rand(
+    random(
       bound: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    removeElement(
-      _element: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     roots(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     triggerDrawEnd(overrides?: CallOverrides): Promise<void>;
 
-    verifier(overrides?: CallOverrides): Promise<string>;
+    wethGateway(overrides?: CallOverrides): Promise<string>;
+
+    winning(
+      _proof: Pool.ProofStruct,
+      _root: PromiseOrValue<BytesLike>,
+      _nullifierHash: PromiseOrValue<BytesLike>,
+      _recipient: PromiseOrValue<string>,
+      _relayer: PromiseOrValue<string>,
+      _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    winningVerifier(overrides?: CallOverrides): Promise<string>;
 
     withdraw(
-      _proof: ProofStruct,
+      _proof: Pool.ProofStruct,
       _root: PromiseOrValue<BytesLike>,
       _nullifierHash: PromiseOrValue<BytesLike>,
       _recipient: PromiseOrValue<string>,
       _relayer: PromiseOrValue<string>,
       _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    withdrawWinning(
-      _proof: ProofStruct,
-      _root: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      _recipient: PromiseOrValue<string>,
-      _relayer: PromiseOrValue<string>,
-      _fee: PromiseOrValue<BigNumberish>,
-      drawId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    yieldGenerator(overrides?: CallOverrides): Promise<string>;
+    withdrawVerifier(overrides?: CallOverrides): Promise<string>;
 
     zeros(
       arg0: PromiseOrValue<BigNumberish>,
@@ -975,6 +953,15 @@ export interface Pool extends BaseContract {
       endTime?: null
     ): LogNewLotteryEventFilter;
 
+    "OwnershipTransferred(address,address)"(
+      previousOwner?: PromiseOrValue<string> | null,
+      newOwner?: PromiseOrValue<string> | null
+    ): OwnershipTransferredEventFilter;
+    OwnershipTransferred(
+      previousOwner?: PromiseOrValue<string> | null,
+      newOwner?: PromiseOrValue<string> | null
+    ): OwnershipTransferredEventFilter;
+
     "Received(address,uint256)"(arg0?: null, arg1?: null): ReceivedEventFilter;
     Received(arg0?: null, arg1?: null): ReceivedEventFilter;
 
@@ -999,18 +986,13 @@ export interface Pool extends BaseContract {
 
     ROOT_HISTORY_SIZE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    WETH(overrides?: CallOverrides): Promise<BigNumber>;
+
     ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
     _triggerDrawEnd(
       drawId: PromiseOrValue<BigNumberish>,
-      amount: PromiseOrValue<BigNumberish>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      random: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    addOwnership(
-      newOwner: PromiseOrValue<string>,
+      index: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1022,7 +1004,6 @@ export interface Pool extends BaseContract {
 
     deposit(
       _commitment: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1040,8 +1021,6 @@ export interface Pool extends BaseContract {
 
     getLastRoot(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getPlayers(overrides?: CallOverrides): Promise<BigNumber>;
-
     hashLeftRight(
       _left: PromiseOrValue<BytesLike>,
       _right: PromiseOrValue<BytesLike>,
@@ -1051,16 +1030,12 @@ export interface Pool extends BaseContract {
     hasher(overrides?: CallOverrides): Promise<BigNumber>;
 
     initDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isOwner(
-      _address: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1078,17 +1053,14 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    numDraws(overrides?: CallOverrides): Promise<BigNumber>;
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    playersCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    rand(
+    random(
       bound: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    removeElement(
-      _element: PromiseOrValue<BytesLike>,
+    renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1097,34 +1069,42 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     triggerDrawEnd(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    verifier(overrides?: CallOverrides): Promise<BigNumber>;
+    wethGateway(overrides?: CallOverrides): Promise<BigNumber>;
+
+    winning(
+      _proof: Pool.ProofStruct,
+      _root: PromiseOrValue<BytesLike>,
+      _nullifierHash: PromiseOrValue<BytesLike>,
+      _recipient: PromiseOrValue<string>,
+      _relayer: PromiseOrValue<string>,
+      _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    winningVerifier(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
-      _proof: ProofStruct,
+      _proof: Pool.ProofStruct,
       _root: PromiseOrValue<BytesLike>,
       _nullifierHash: PromiseOrValue<BytesLike>,
       _recipient: PromiseOrValue<string>,
       _relayer: PromiseOrValue<string>,
       _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    withdrawWinning(
-      _proof: ProofStruct,
-      _root: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      _recipient: PromiseOrValue<string>,
-      _relayer: PromiseOrValue<string>,
-      _fee: PromiseOrValue<BigNumberish>,
-      drawId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    yieldGenerator(overrides?: CallOverrides): Promise<BigNumber>;
+    withdrawVerifier(overrides?: CallOverrides): Promise<BigNumber>;
 
     zeros(
       arg0: PromiseOrValue<BigNumberish>,
@@ -1139,18 +1119,13 @@ export interface Pool extends BaseContract {
 
     ROOT_HISTORY_SIZE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     ZERO_VALUE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _triggerDrawEnd(
       drawId: PromiseOrValue<BigNumberish>,
-      amount: PromiseOrValue<BigNumberish>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      random: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    addOwnership(
-      newOwner: PromiseOrValue<string>,
+      index: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1162,7 +1137,6 @@ export interface Pool extends BaseContract {
 
     deposit(
       _commitment: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1180,8 +1154,6 @@ export interface Pool extends BaseContract {
 
     getLastRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getPlayers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     hashLeftRight(
       _left: PromiseOrValue<BytesLike>,
       _right: PromiseOrValue<BytesLike>,
@@ -1191,16 +1163,12 @@ export interface Pool extends BaseContract {
     hasher(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isOwner(
-      _address: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1218,17 +1186,14 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    numDraws(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    playersCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    rand(
+    random(
       bound: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    removeElement(
-      _element: PromiseOrValue<BytesLike>,
+    renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1237,34 +1202,42 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     triggerDrawEnd(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    verifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    wethGateway(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    winning(
+      _proof: Pool.ProofStruct,
+      _root: PromiseOrValue<BytesLike>,
+      _nullifierHash: PromiseOrValue<BytesLike>,
+      _recipient: PromiseOrValue<string>,
+      _relayer: PromiseOrValue<string>,
+      _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    winningVerifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
-      _proof: ProofStruct,
+      _proof: Pool.ProofStruct,
       _root: PromiseOrValue<BytesLike>,
       _nullifierHash: PromiseOrValue<BytesLike>,
       _recipient: PromiseOrValue<string>,
       _relayer: PromiseOrValue<string>,
       _fee: PromiseOrValue<BigNumberish>,
+      _drawId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdrawWinning(
-      _proof: ProofStruct,
-      _root: PromiseOrValue<BytesLike>,
-      _nullifierHash: PromiseOrValue<BytesLike>,
-      _recipient: PromiseOrValue<string>,
-      _relayer: PromiseOrValue<string>,
-      _fee: PromiseOrValue<BigNumberish>,
-      drawId: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    yieldGenerator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    withdrawVerifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     zeros(
       arg0: PromiseOrValue<BigNumberish>,

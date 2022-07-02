@@ -53,13 +53,13 @@ export default function Statistics() {
   const contract = useZKPoolContract(getAddress())
 
   const [users, setUsers] = useState(0)
-  const [drawsCount, setDrawsCount] = useState('0')
+  const [drawsCount, setDrawsCount] = useState(0)
 
   const getStats = async () => {
     const users = await contract.nextIndex()
     setUsers(users)
-    const draws = await contract.numDraws()
-    setDrawsCount(draws.toString())
+    const draws = await contract.currentDrawId()
+    setDrawsCount(parseInt(draws.toString()) + 1)
   }
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function Statistics() {
 
   return (
     <Box maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
         <StatsCard
           title={'Users'}
           // @ts-ignore
@@ -77,15 +77,16 @@ export default function Statistics() {
         />
         <StatsCard
           title={'Draws'}
+          // @ts-ignore
           stat={drawsCount}
           icon={<FiServer size={'3em'} />}
         />
-        <StatsCard
+        {/* <StatsCard
           title={'Total Winning'}
           // @ts-ignore
           stat={drawsCount * 0.001}
           icon={<FiDollarSign size={'3em'} />}
-        />
+        /> */}
       </SimpleGrid>
     </Box>
   )

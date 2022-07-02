@@ -1,6 +1,5 @@
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
-import { useRef, useState } from 'react'
-import { checkNullifier } from '../util'
+import { useRef } from 'react'
 import {
   Button,
   FormControl,
@@ -26,21 +25,18 @@ import { useRouter } from 'next/router'
 interface PackageTierProps {
   title: string
   options: Array<{ id: number; desc: string; status: boolean }>
-  typePlan: string
   checked?: boolean
-  winnerSelected: boolean
-  drawNullifier: any
   isSpent: boolean
+  isCompleted: boolean
+  random: number
 }
 
 const PackageTier = ({
   title,
   options,
-  typePlan,
-  winnerSelected,
-  checked = false,
   isSpent,
-  drawNullifier,
+  isCompleted,
+  random,
 }: PackageTierProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const finalRef = useRef(null)
@@ -73,7 +69,7 @@ const PackageTier = ({
           </ListItem>
         ))}
       </List>
-      <Heading size={'xl'}>{typePlan}</Heading>
+      <Heading size={'xl'}>{random}</Heading>
       <Stack>
         <Button
           size="md"
@@ -83,19 +79,15 @@ const PackageTier = ({
           _hover={{
             bg: 'white.390',
           }}
-          disabled={!winnerSelected || isSpent}
+          disabled={!isCompleted}
           onClick={() => {
             router.push({
               pathname: '/check',
-              query: { drawNullifier: drawNullifier, title },
+              query: { title, random },
             })
           }}
         >
-          {isSpent
-            ? 'Already Spent'
-            : !winnerSelected
-            ? 'In Progress'
-            : 'Check'}
+          {!isCompleted ? 'In Progress' : 'Check'}
         </Button>
       </Stack>
     </Stack>

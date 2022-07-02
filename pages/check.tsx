@@ -4,18 +4,12 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Grid,
   GridItem,
   Button,
   Container,
   Input,
   useDisclosure,
-  Code,
-  Checkbox,
   FormControl,
   FormHelperText,
   Box,
@@ -27,13 +21,21 @@ import {
   AlertDescription,
   FormErrorMessage,
 } from '@chakra-ui/react'
-import { checkNullifier, getAddress, withdrawWinning } from '../util'
+import { checkBlindGuess, getAddress, withdraw, winning } from '../util';
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import Link from 'next/link'
 import { ethers } from 'ethers'
 import useZKPoolContract from '../hooks/useZkPoolContract'
+
+const Message = {
+  title: 'title',
+  msg: 'message',
+  type: '',
+  status: false,
+  won: false,
+}
 
 const alertTemp = {
   type: 'error',
@@ -44,16 +46,48 @@ const alertTemp = {
 function Check() {
   const [withdrawNote, setWithdrawNote] = useState()
   const [checkLoader, setCheckLoader] = useState(false)
+  const [message, setMessage] = useState(Message)
   const [alert, setAlert] = useState(alertTemp)
   const [isAddressError, setIsAddressError] = useState(false)
   const [isEligible, setIsEligible] = useState(false)
   const [withdrawLoader, setWithdrawLoader] = useState(false)
   const [withdrawAddress, setWithdrawAddress] = useState('')
-  const [message, setMessage] = useState(
-    'Enter your deposit note to check weather or not you have won the this draw',
-  )
 
   const contract = useZKPoolContract(getAddress())
+
+  const onWithdraw = async () => {
+    try {
+      if (!ethers.utils.isAddress(withdrawAddress)) {
+        setWithdrawLoader(false)
+        setIsAddressError(true)
+        return
+      }
+      if (message.won) {
+        const alert = await winning(
+          title,
+          random,
+          withdrawNote,
+          withdrawAddress,
+          contract,
+        )
+      } else {
+        const alert = await withdraw(
+          title,
+          random,
+          withdrawNote,
+          withdrawAddress,
+          contract,
+        )
+      }
+      setWithdrawLoader(false)
+      // @ts-ignore
+      setAlert(alert)
+      onIsAlertOpen()
+    } catch (err) {
+      setWithdrawLoader(false)
+      console.log({ err })
+    }
+  }
 
   const {
     isOpen: isAlertOpen,
@@ -62,26 +96,18 @@ function Check() {
   } = useDisclosure()
   const router = useRouter()
 
-  const { drawNullifier, title } = router.query
+  const { random, title } = router.query
   const onCheckEligibility = async () => {
     try {
       setCheckLoader(true)
-      const alert = await checkNullifier(withdrawNote, drawNullifier)
-      if (alert.type === 'eligibility') {
-        console.log({ alert })
-        setIsEligible(alert.status)
-        if (alert.status) {
-          setMessage(
-            'Hurray you have won the draw enter the withdrawal address to withdraw winning amount',
-          )
-        } else {
-          setMessage(alert.title)
-        }
+      const response = await checkBlindGuess(withdrawNote, random)
+      if (response.type === 'eligibility') {
+        setMessage(response)
         setCheckLoader(false)
       } else {
         setCheckLoader(false)
         // @ts-ignore
-        setAlert(alert)
+        setAlert(response)
         onIsAlertOpen()
       }
     } catch (err) {
@@ -97,28 +123,28 @@ function Check() {
     }
   }
 
-  const onWithdraw = async () => {
-    try {
-      if (!ethers.utils.isAddress(withdrawAddress)) {
-        setWithdrawLoader(false)
-        setIsAddressError(true)
-        return
-      }
-      const alert = await withdrawWinning(
-        title,
-        withdrawNote,
-        withdrawAddress,
-        contract,
-      )
-      setWithdrawLoader(false)
-      // @ts-ignore
-      setAlert(alert)
-      onIsAlertOpen()
-    } catch (err) {
-      setWithdrawLoader(false)
-      console.log({ err })
-    }
-  }
+  // const onWithdraw = async () => {
+  //   try {
+  //     if (!ethers.utils.isAddress(withdrawAddress)) {
+  //       setWithdrawLoader(false)
+  //       setIsAddressError(true)
+  //       return
+  //     }
+  //     const alert = await withdrawWinning(
+  //       title,
+  //       withdrawNote,
+  //       withdrawAddress,
+  //       contract,
+  //     )
+  //     setWithdrawLoader(false)
+  //     // @ts-ignore
+  //     setAlert(alert)
+  //     onIsAlertOpen()
+  //   } catch (err) {
+  //     setWithdrawLoader(false)
+  //     console.log({ err })
+  //   }
+  // }
 
   return (
     <Container
@@ -144,7 +170,7 @@ function Check() {
             {!isEligible ? `Draw: ${title}` : `🎉 You Won 🎉`}
           </Heading>
           <Text fontSize="xl" align="center">
-            {message}
+            {message.msg}
           </Text>
         </Box>
         <FormControl style={{ marginTop: '50px' }}>
@@ -160,7 +186,7 @@ function Check() {
             Make sure to add correct formet of note
           </FormHelperText>
         </FormControl>
-        {!isEligible && (
+        {!message.status && (
           <Button
             colorScheme={'orange'}
             bg={'#fc6643'}
@@ -179,7 +205,7 @@ function Check() {
             Check
           </Button>
         )}
-        {isEligible && (
+        {message.status && (
           <>
             {' '}
             <FormControl isInvalid={isAddressError}>
@@ -189,7 +215,7 @@ function Check() {
                   setIsAddressError(false)
                   setWithdrawAddress(e.target.value)
                 }}
-                style={{ marginTop: '60px' }}
+                style={{ marginTop: '50px' }}
               />
               {!isAddressError ? (
                 <FormHelperText>
@@ -198,7 +224,8 @@ function Check() {
               ) : (
                 <FormErrorMessage>Invalid Address Formet</FormErrorMessage>
               )}
-            </FormControl>
+            </FormControl>{' '}
+            {/* TODO add the try another button here */}
             <Button
               colorScheme={'orange'}
               bg={'#fc6643'}

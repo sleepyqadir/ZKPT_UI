@@ -1,10 +1,19 @@
 import Nav from '../components/Nav'
-import { Box, Container, Divider, Heading, Stack, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Heading,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
 import PackageTier from '../components/PackageTier'
 import Statistics from '../components/Statistics'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useState, useEffect } from 'react'
 import { getAddress } from '../util'
+import { ethers } from 'ethers'
 
 function Draw() {
   const contract = useZKPoolContract(getAddress())
@@ -13,7 +22,6 @@ function Draw() {
 
   const getStats = async () => {
     const draws = await contract.getDraws()
-    console.log('========>', draws[2].nullifierHashIndex.toString())
     setDraws(draws)
   }
 
@@ -34,42 +42,6 @@ function Draw() {
       <Statistics />
       <Box py={6} px={5} style={{ minHeight: '100vh' }}>
         <Stack spacing={4} width={'100%'} direction={'column'}>
-          <Stack
-            p={5}
-            alignItems={'center'}
-            justifyContent={{
-              base: 'flex-start',
-              md: 'space-around',
-            }}
-            direction={{
-              base: 'column',
-              md: 'row',
-            }}
-          >
-            <Stack
-              width={{
-                base: '100%',
-                md: '40%',
-              }}
-              textAlign={'center'}
-            >
-              <Heading size={'lg'}>
-                The Right Plan for <Text color="#fc6643">Your Savings</Text>
-              </Heading>
-            </Stack>
-            <Stack
-              width={{
-                base: '100%',
-                md: '60%',
-              }}
-            >
-              <Text textAlign={'center'}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
-                quod in iure vero. Facilis magnam, sed officiis commodi labore
-                odit.
-              </Text>
-            </Stack>
-          </Stack>
           <Divider />
           <Stack
             style={{ marginRight: '75px' }}
@@ -84,7 +56,7 @@ function Draw() {
           >
             <Heading size={'md'}>DRAWS</Heading>
             <Heading size={'md'}>STATUS</Heading>
-            <Heading size={'md'}>TICKET PRIZE</Heading>
+            <Heading size={'md'}>Random No</Heading>
             <Heading size={'md'}>CHECK</Heading>
           </Stack>
           {draws.map((draw) => {
@@ -93,25 +65,15 @@ function Draw() {
                 <Divider />
                 <PackageTier
                   title={draw.drawId.toString()}
-                  drawNullifier={draw.nullifierHash}
                   isSpent={draw.isSpent}
-                  winnerSelected={
-                    draw.nullifierHash ===
-                    '0x0000000000000000000000000000000000000000000000000000000000000000'
-                      ? false
-                      : true
-                  }
-                  typePlan="0.1 ETH"
+                  isCompleted={draw.isCompleted}
+                  random={draw.isCompleted ? draw.random.toString() : 'Not yet'}
                   options={[
                     { id: 1, desc: 'Spent', status: draw.isSpent },
                     {
                       id: 2,
                       desc: 'Winner Seclected',
-                      status:
-                        draw.nullifierHash ===
-                        '0x0000000000000000000000000000000000000000000000000000000000000000'
-                          ? false
-                          : true,
+                      status: draw.isCompleted,
                     },
                     {
                       id: 3,

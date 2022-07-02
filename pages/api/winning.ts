@@ -24,11 +24,18 @@ export default async (req, res) => {
   try {
     const contract = new Contract(getAddress(), POOL_ABI, signer);
 
-    const tx = await contract.withdrawWinning(proof, ...args, {});
+    console.log(...[...args.slice(2, 7), args[0]]);
+
+    const tx = await contract.winning(
+      proof,
+      ...[...args.slice(2, 7), args[0]],
+      {}
+    );
     const txReciept = await tx.wait();
     console.log({ txReciept });
     res.json(txReciept);
   } catch (err) {
+    console.log({ err });
     res.json(err);
   }
 };

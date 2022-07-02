@@ -31,18 +31,20 @@ const ETHERSCAN_PREFIXES = {
   42: 'kovan',
 };
 
+// TODO take the guess number from the users
 export const createDeposit = async (
   nullifier = ethers.utils.randomBytes(15),
-  secret = ethers.utils.randomBytes(15)
+  secret = ethers.utils.randomBytes(15),
+  guess = 4
 ) => {
   const poseidon = await circomlibjs.buildPoseidon();
-  const deposit = Deposit.new(nullifier, secret, poseidon);
+  const deposit = Deposit.new(nullifier, secret, guess, poseidon);
   return deposit;
 };
 
 export const generateNote = async (deposit: Deposit) => {
   const AMOUNT = '0.1';
-  const netId = '4';
+  const netId = deposit.guess;
   return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}0x${deposit.secret}`;
 };
 
@@ -55,7 +57,7 @@ export const parseNote = async (noteString) => {
     const nullifier = new Uint8Array(bytesArrayNullifier);
     const bytesArraySecret = noteArray[2].split(',').map((x) => +x);
     const secret = new Uint8Array(bytesArraySecret);
-    return createDeposit(nullifier, secret);
+    return createDeposit(nullifier, secret, parseInt(match[3]));
   } catch (err) {
     console.log({ err });
   }
@@ -76,11 +78,18 @@ export const poseidonHash = (poseidon: any, inputs: BigNumberish[]) => {
   }
 };
 
-const generateMerkleProof = async (deposit, contract: Pool) => {
+const generateMerkleProof = async (deposit, drawId, contract: Pool) => {
   const eventFilter = contract.filters.Deposit();
   const events = await contract.queryFilter(eventFilter, 0, 'latest');
   const poseidon = await circomlibjs.buildPoseidon();
   const tree = new MerkleTree(20, 'test', new PoseidonHasher(poseidon));
+
+  const saltedCommitment = await poseidonHash(poseidon, [
+    deposit.commitment,
+    drawId,
+  ]);
+
+  console.log({ saltedCommitment });
 
   const leaves = events
     .sort((a, b) => a.args.leafIndex - b.args.leafIndex) // Sort events in chronological order
@@ -91,9 +100,10 @@ const generateMerkleProof = async (deposit, contract: Pool) => {
   }
 
   // Find current commitment in the tree
-  const depositEvent = events.find(
-    (e) => e.args.commitment === deposit.commitment
-  );
+  const depositEvent = events.find((e) => {
+    console.log(e.args.commitment, saltedCommitment);
+    return e.args.commitment === saltedCommitment;
+  });
 
   const leafIndex = depositEvent ? depositEvent.args.leafIndex : -1;
 
@@ -163,8 +173,8 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
     } else {
       const commitment = deposit.commitment;
       const nullifierHash = deposit.nullifierHash;
-      const tx = await contract.deposit(commitment, nullifierHash, {
-        value: ethers.utils.parseEther('0.1'),
+      const tx = await contract.deposit(commitment, {
+        value: ethers.utils.parseEther('0.01'),
       });
       const txReceipt = await tx.wait();
       return {
@@ -182,9 +192,16 @@ export const depositEth = async (deposit: Deposit, contract: Pool) => {
   }
 };
 
-export const withdraw = async (note, recipient, contract: Pool) => {
+export const withdraw = async (
+  drawId,
+  random,
+  note,
+  recipient,
+  contract: Pool
+) => {
   try {
     const deposit = await parseNote(note);
+    console.log({ deposit });
     if (!deposit) {
       return {
         type: 'error',
@@ -194,10 +211,13 @@ export const withdraw = async (note, recipient, contract: Pool) => {
       };
     }
     const snarkProof = await generateSnarkProof(
+      drawId,
+      random,
       deposit,
       recipient,
       contract,
-      '0x99d667ff3e5891a5f40288cb94276158ae8176a0'
+      '0x99d667ff3e5891a5f40288cb94276158ae8176a0',
+      false
     );
 
     if (!snarkProof.proof) {
@@ -218,11 +238,21 @@ export const withdraw = async (note, recipient, contract: Pool) => {
 
     const txResponse = await response.json();
 
-    return {
-      type: 'success',
-      title: 'Transaction Success',
-      message: `https://rinkeby.etherscan.io/tx/${txResponse.transactionHash}`,
-    };
+    console.log({ txResponse });
+
+    if (txResponse.transactionHash) {
+      return {
+        type: 'success',
+        title: 'Transaction Success',
+        message: `https://rinkeby.etherscan.io/tx/${txResponse.transactionHash}`,
+      };
+    } else {
+      return {
+        type: 'error',
+        title: 'Something went wrong',
+        message: txResponse,
+      };
+    }
   } catch (err) {
     console.log('error while withdrawing', { err });
     return {
@@ -233,8 +263,9 @@ export const withdraw = async (note, recipient, contract: Pool) => {
   }
 };
 
-export const withdrawWinning = async (
+export const winning = async (
   drawId,
+  random,
   note,
   recipient,
   contract: Pool
@@ -250,10 +281,13 @@ export const withdrawWinning = async (
       };
     }
     const snarkProof = await generateSnarkProof(
+      drawId,
+      random,
       deposit,
       recipient,
       contract,
-      '0x99d667ff3e5891a5f40288cb94276158ae8176a0'
+      '0x99d667ff3e5891a5f40288cb94276158ae8176a0',
+      true
     );
 
     if (!snarkProof.proof) {
@@ -261,9 +295,7 @@ export const withdrawWinning = async (
     }
 
     console.log({ proof: snarkProof.proof, args: snarkProof.args });
-    snarkProof.args.push(drawId);
-    console.log(snarkProof.args);
-    const response = await fetch(`/api/withdrawWinning/`, {
+    const response = await fetch(`/api/winning/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -298,9 +330,16 @@ interface Proof {
   c: [BigNumberish, BigNumberish];
 }
 
-export const prove = async (witness: any): Promise<Proof> => {
-  let wasmPath = '/withdraw.wasm';
-  let zkeyPath = '/circuit_final.zkey';
+export const prove = async (witness: any, won): Promise<Proof> => {
+  let wasmPath: string;
+  let zkeyPath: string;
+  if (won) {
+    wasmPath = '/winning.wasm';
+    zkeyPath = '/winning.zkey';
+  } else {
+    wasmPath = '/withdraw.wasm';
+    zkeyPath = '/withdraw.zkey';
+  }
   if (typeof window === 'undefined') {
     wasmPath = serverPath(`/public${wasmPath}`);
     zkeyPath = serverPath(`/public${zkeyPath}`);
@@ -322,14 +361,17 @@ export const prove = async (witness: any): Promise<Proof> => {
 };
 
 const generateSnarkProof = async (
+  drawId,
+  random,
   deposit: Deposit,
   recipient,
   contract: Pool,
-  relayer
+  relayer,
+  won
 ) => {
   // Compute merkle proof of our commitment
 
-  const response = await generateMerkleProof(deposit, contract);
+  const response = await generateMerkleProof(deposit, drawId, contract);
 
   if (response.type) {
     return { ...response };
@@ -344,8 +386,12 @@ const generateSnarkProof = async (
     recipient: recipient,
     relayer,
     fee: 0,
-    secret: BigNumber.from(deposit.secret).toBigInt(),
+    random: parseInt(random),
+    draw: parseInt(drawId),
+
     // Private
+    blind: deposit.guess,
+    secret: BigNumber.from(deposit.secret).toBigInt(),
     nullifier: BigNumber.from(deposit.nullifier).toBigInt(),
     pathElements: path_elements,
     pathIndices: path_index,
@@ -353,9 +399,11 @@ const generateSnarkProof = async (
 
   console.log({ witness });
 
-  const solidityProof = await prove(witness);
+  const solidityProof = await prove(witness, won);
 
   const args = [
+    witness.draw,
+    witness.random,
     witness.root,
     witness.nullifierHash,
     witness.recipient,
@@ -395,13 +443,11 @@ export const isSupportedNetwork = (id: number): boolean => {
 };
 
 export const getAddress = () => {
-  return '0x2442195C16d7b892E4f66A8Be107C525c825613c';
+  return '0x021999a5E1487120180b7219B1302f6083DD9fEC';
 };
 
-export const checkNullifier = async (note: string, drawNullifier: any) => {
+export const checkBlindGuess = async (note: string, random: any) => {
   const deposit = await parseNote(note);
-  console.log({ deposit });
-  console.log('nullifier hash ======>', deposit.nullifierHash, drawNullifier);
   if (!deposit) {
     return {
       type: 'error',
@@ -410,23 +456,26 @@ export const checkNullifier = async (note: string, drawNullifier: any) => {
         'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
     };
   }
-  if (deposit.nullifierHash === drawNullifier) {
+  if (deposit.guess === parseInt(random)) {
     return {
       type: 'eligibility',
-      title: 'You have won the draw',
+      msg: 'Hurray you have won the draw enter the withdrawal address to withdraw winning amount',
       status: true,
+      won: true,
     };
   } else {
     return {
       type: 'eligibility',
-      title: "Sorry you haven't won this draw try another note",
-      status: false,
+      msg: "Sorry you haven't won this draw try another note or withdraw your amount",
+      status: true,
+      won: false,
     };
   }
 };
 
 export const switchNetwork = (mainnet: boolean) => {
   if (mainnet) {
+    // @ts-ignore
     window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: '0x89' }],

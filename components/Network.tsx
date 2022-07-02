@@ -5,8 +5,6 @@ import { getNetwork, switchNetwork } from '../util'
 const Network = () => {
   const { chainId, account } = useWeb3React()
 
-  // manage connecting state for injected connector
-  console.log({ account, chainId })
   if (typeof account !== 'string') {
     return null
   }

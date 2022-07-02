@@ -11,7 +11,17 @@ const _abi = [
     inputs: [
       {
         internalType: "contract IVerifier",
-        name: "_verifier",
+        name: "_verifierWithdraw",
+        type: "address",
+      },
+      {
+        internalType: "contract IVerifier",
+        name: "_verifierWinning",
+        type: "address",
+      },
+      {
+        internalType: "contract IWETHGateway",
+        name: "_wethGateway",
         type: "address",
       },
       {
@@ -33,6 +43,16 @@ const _abi = [
         internalType: "address",
         name: "_relayer",
         type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_weth",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_minutes",
+        type: "uint256",
       },
     ],
     stateMutability: "nonpayable",
@@ -86,6 +106,25 @@ const _abi = [
       },
     ],
     name: "LogNewLottery",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
     type: "event",
   },
   {
@@ -179,6 +218,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "WETH",
+    outputs: [
+      {
+        internalType: "contract IWETH",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "ZERO_VALUE",
     outputs: [
       {
@@ -199,34 +251,11 @@ const _abi = [
       },
       {
         internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes32",
-        name: "_nullifierHash",
-        type: "bytes32",
-      },
-      {
-        internalType: "uint256",
-        name: "random",
+        name: "index",
         type: "uint256",
       },
     ],
     name: "_triggerDrawEnd",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "addOwnership",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -277,11 +306,6 @@ const _abi = [
         name: "_commitment",
         type: "bytes32",
       },
-      {
-        internalType: "bytes32",
-        name: "_nullifierHash",
-        type: "bytes32",
-      },
     ],
     name: "deposit",
     outputs: [],
@@ -319,16 +343,6 @@ const _abi = [
         type: "bool",
       },
       {
-        internalType: "uint256",
-        name: "nullifierHashIndex",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes32",
-        name: "nullifierHash",
-        type: "bytes32",
-      },
-      {
         internalType: "bool",
         name: "isSpent",
         type: "bool",
@@ -336,6 +350,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "random",
         type: "uint256",
       },
     ],
@@ -388,16 +407,6 @@ const _abi = [
             type: "bool",
           },
           {
-            internalType: "uint256",
-            name: "nullifierHashIndex",
-            type: "uint256",
-          },
-          {
-            internalType: "bytes32",
-            name: "nullifierHash",
-            type: "bytes32",
-          },
-          {
             internalType: "bool",
             name: "isSpent",
             type: "bool",
@@ -405,6 +414,11 @@ const _abi = [
           {
             internalType: "uint256",
             name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "random",
             type: "uint256",
           },
         ],
@@ -424,19 +438,6 @@ const _abi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getPlayers",
-    outputs: [
-      {
-        internalType: "bytes32[]",
-        name: "",
-        type: "bytes32[]",
       },
     ],
     stateMutability: "view",
@@ -480,7 +481,13 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_minutes",
+        type: "uint256",
+      },
+    ],
     name: "initDraw",
     outputs: [],
     stateMutability: "nonpayable",
@@ -495,25 +502,6 @@ const _abi = [
       },
     ],
     name: "isKnownRoot",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_address",
-        type: "address",
-      },
-    ],
-    name: "isOwner",
     outputs: [
       {
         internalType: "bool",
@@ -590,25 +578,12 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "numDraws",
+    name: "owner",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "address",
         name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "playersCount",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -622,7 +597,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "rand",
+    name: "random",
     outputs: [
       {
         internalType: "uint256",
@@ -634,14 +609,8 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "_element",
-        type: "bytes32",
-      },
-    ],
-    name: "removeElement",
+    inputs: [],
+    name: "renounceOwnership",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -666,6 +635,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "triggerDrawEnd",
     outputs: [],
@@ -674,7 +656,80 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "verifier",
+    name: "wethGateway",
+    outputs: [
+      {
+        internalType: "contract IWETHGateway",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "uint256[2]",
+            name: "a",
+            type: "uint256[2]",
+          },
+          {
+            internalType: "uint256[2][2]",
+            name: "b",
+            type: "uint256[2][2]",
+          },
+          {
+            internalType: "uint256[2]",
+            name: "c",
+            type: "uint256[2]",
+          },
+        ],
+        internalType: "struct Pool.Proof",
+        name: "_proof",
+        type: "tuple",
+      },
+      {
+        internalType: "bytes32",
+        name: "_root",
+        type: "bytes32",
+      },
+      {
+        internalType: "bytes32",
+        name: "_nullifierHash",
+        type: "bytes32",
+      },
+      {
+        internalType: "address payable",
+        name: "_recipient",
+        type: "address",
+      },
+      {
+        internalType: "address payable",
+        name: "_relayer",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_fee",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_drawId",
+        type: "uint256",
+      },
+    ],
+    name: "winning",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "winningVerifier",
     outputs: [
       {
         internalType: "contract IVerifier",
@@ -705,7 +760,7 @@ const _abi = [
             type: "uint256[2]",
           },
         ],
-        internalType: "struct Proof",
+        internalType: "struct Pool.Proof",
         name: "_proof",
         type: "tuple",
       },
@@ -732,6 +787,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "_fee",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_drawId",
         type: "uint256",
       },
     ],
@@ -741,71 +801,11 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        components: [
-          {
-            internalType: "uint256[2]",
-            name: "a",
-            type: "uint256[2]",
-          },
-          {
-            internalType: "uint256[2][2]",
-            name: "b",
-            type: "uint256[2][2]",
-          },
-          {
-            internalType: "uint256[2]",
-            name: "c",
-            type: "uint256[2]",
-          },
-        ],
-        internalType: "struct Proof",
-        name: "_proof",
-        type: "tuple",
-      },
-      {
-        internalType: "bytes32",
-        name: "_root",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "_nullifierHash",
-        type: "bytes32",
-      },
-      {
-        internalType: "address payable",
-        name: "_recipient",
-        type: "address",
-      },
-      {
-        internalType: "address payable",
-        name: "_relayer",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_fee",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "drawId",
-        type: "uint256",
-      },
-    ],
-    name: "withdrawWinning",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
     inputs: [],
-    name: "yieldGenerator",
+    name: "withdrawVerifier",
     outputs: [
       {
-        internalType: "contract YieldGenerator",
+        internalType: "contract IVerifier",
         name: "",
         type: "address",
       },

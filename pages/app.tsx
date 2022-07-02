@@ -26,6 +26,16 @@ import {
   AlertTitle,
   AlertDescription,
   FormErrorMessage,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Flex,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
 } from '@chakra-ui/react'
 import {
   createDeposit,
@@ -47,17 +57,6 @@ const alertTemp = {
   message: 'message',
 }
 
-export enum STATUS {
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
-
-// const alertTempTransaction = {
-//   type: 'success',
-//   title: 'Transaction Success',
-//   message: `https://rinkeby.etherscan.io/tx/`,
-// }
-
 function App() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -66,34 +65,15 @@ function App() {
     onClose: onIsAlertClose,
   } = useDisclosure()
   const contract = useZKPoolContract(getAddress())
-  const { chainId, account, library } = useWeb3React()
+  const { account } = useWeb3React()
   const [note, setNote] = useState('')
   const [deposit, setDeposit] = useState(null)
-  const [withdrawAddress, setWithdrawAddress] = useState('')
-  const [withdrawNote, setWithdrawNote] = useState('')
-  const [withdrawLoader, setWithdrawLoader] = useState(false)
   const [depositLoader, setDepositLoader] = useState(false)
   const [sendDepositLoader, setSendDepositLoader] = useState(false)
   const [alert, setAlert] = useState(alertTemp)
-  const [isAddressError, setIsAddressError] = useState(false)
+  const [value, setValue] = useState(0)
 
-  const onWithdraw = async () => {
-    try {
-      if (!ethers.utils.isAddress(withdrawAddress)) {
-        setWithdrawLoader(false)
-        setIsAddressError(true)
-        return
-      }
-      const alert = await withdraw(withdrawNote, withdrawAddress, contract)
-      setWithdrawLoader(false)
-      // @ts-ignore
-      setAlert(alert)
-      onIsAlertOpen()
-    } catch (err) {
-      setWithdrawLoader(false)
-      console.log({ err })
-    }
-  }
+  const handleChange = (value) => setValue(value)
 
   const onDeposit = async () => {
     try {
@@ -110,7 +90,7 @@ function App() {
         return
       } else {
         onOpen()
-        const newDeposit = await createDeposit()
+        const newDeposit = await createDeposit(undefined, undefined, value)
         setDeposit(newDeposit)
         const depositNote = await generateNote(newDeposit)
         setNote(depositNote)
@@ -139,245 +119,210 @@ function App() {
       maxW="1200px"
     >
       <Nav page={'Draws'} />
-      <Grid
-        templateColumns="repeat(2, 1fr)"
-        gap={20}
+      <Container
+        w="100%"
+        h="10"
         style={{
-          marginTop: '80px',
+          height: '100vh',
+          backgroundPosition: 'center',
+          marginTop: '10%',
         }}
+        maxW="600px"
       >
-        <GridItem w="100%" h="10">
-          <Box maxW="32rem">
-            <Heading mb={4} style={{ textAlign: 'center' }}>
-              Buy Ticket
-            </Heading>
-            <Text fontSize="xl" align="center">
-              Buying Ticket will generate random note that you can use to
-              withdraw your funds to any other address without revealing your
-              identity
-            </Text>
-          </Box>
-          <div className="box">
-            <div className="inner">
-              <h1>ZKPoolTogether 2022</h1>
-              <div className="info clearfix">
-                <div className="wp">
-                  Ticket No<h2>1</h2>
-                </div>
-                <div className="wp">
-                  Curr<h2>ETH</h2>
-                </div>
-                <div className="wp">
-                  Prize<h2>0.001</h2>
-                </div>
+        <Box maxW="32rem">
+          <Heading mb={4} style={{ textAlign: 'center' }}>
+            Buy Ticket
+          </Heading>
+          <Text fontSize="xl" style={{ textAlign: 'center' }}>
+            Buy ticket and pick a random blind guess to become part of current
+            draw. At the end of the draw a random number is selected through VRF
+            to pick the user.
+          </Text>
+        </Box>
+        <div className="box">
+          <div className="inner">
+            <h1>ZKPoolTogether 2022</h1>
+            <div className="info clearfix">
+              <div className="wp">
+                Draw No<h2>1</h2>
               </div>
-              <div className="total clearfix">
-                <h2>
-                  Total : <p>0.1 ETH</p>
-                </h2>
+              <div className="wp">
+                Curr<h2>ETH</h2>
+              </div>
+              <div className="wp">
+                Prize<h2>0.01</h2>
               </div>
             </div>
+            <div className="total clearfix">
+              <h2>
+                Total : <p>0.01 ETH</p>
+              </h2>
+            </div>
           </div>
+        </div>
 
-          <Button
-            colorScheme={'orange'}
-            bg={'#fc6643'}
-            px={6}
-            _hover={{
-              bg: 'orange.390',
-            }}
-            style={{ marginTop: '20%' }}
-            width="100%"
-            isLoading={depositLoader}
-            loadingText="Buying"
-            onClick={() => {
-              setDepositLoader(true)
-              onDeposit()
-            }}
+        <Flex>
+          <NumberInput
+            maxW="100px"
+            style={{ marginTop: '5%' }}
+            value={value}
+            onChange={handleChange}
           >
-            Buy
-          </Button>
-        </GridItem>
-        <GridItem w="100%" h="10">
-          <Box maxW="32rem">
-            <Heading mb={4} style={{ textAlign: 'center' }}>
-              Sell Ticket
-            </Heading>
-            <Text fontSize="xl" align="center">
-              Buying Ticket will generate random note that you can use to
-              withdraw your funds to any other address without revealing your
-              identity
-            </Text>
-          </Box>
-          <FormControl style={{ marginTop: '50px' }}>
-            <Input
-              placeholder="Withdraw Note"
-              onChange={(e) => {
-                setWithdrawNote(e.target.value)
-              }}
-            />
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Slider
+            flex="1"
+            focusThumbOnChange={false}
+            value={value}
+            onChange={handleChange}
+          >
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <SliderThumb fontSize="sm" boxSize="32px" children={value} />
+          </Slider>
+        </Flex>
 
-            <FormHelperText>
-              Make sure to add correct formet of note
-            </FormHelperText>
-          </FormControl>
-          <FormControl isInvalid={isAddressError}>
-            <Input
-              placeholder="Withdraw Address"
-              onChange={(e) => {
-                setIsAddressError(false)
-                setWithdrawAddress(e.target.value)
-              }}
-              style={{ marginTop: '50px' }}
-            />
-            {!isAddressError ? (
-              <FormHelperText>
-                Address you want to withdraw funds to
-              </FormHelperText>
-            ) : (
-              <FormErrorMessage>Invalid Address Formet</FormErrorMessage>
+        <Button
+          colorScheme={'orange'}
+          bg={'#fc6643'}
+          px={6}
+          _hover={{
+            bg: 'orange.390',
+          }}
+          style={{ marginTop: '5%' }}
+          width="100%"
+          isLoading={depositLoader}
+          loadingText="Buying"
+          onClick={() => {
+            setDepositLoader(true)
+            onDeposit()
+          }}
+        >
+          Buy
+        </Button>
+      </Container>
+
+      <Modal
+        isOpen={isAlertOpen}
+        size={'xl'}
+        onClose={() => {
+          onIsAlertClose()
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <Alert
+            // @ts-ignore
+            status={alert.type}
+            variant="subtle"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            height="200px"
+          >
+            <AlertIcon boxSize="40px" mr={0} />
+            <Box>
+              <AlertTitle mt={4} mb={1} fontSize="lg">
+                {alert.title}
+              </AlertTitle>
+              <AlertDescription maxWidth="md">{alert.message}</AlertDescription>
+            </Box>
+            {alert.type === 'success' && (
+              <Grid margin="2" templateColumns="repeat(2, 1fr)" gap={6}>
+                <GridItem>
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(alert.message)
+                    }}
+                  >
+                    {' '}
+                    <CopyIcon />{' '}
+                  </Button>
+                </GridItem>
+                <GridItem>
+                  <Button>
+                    <Link href={alert.message}>
+                      <a target="_blank"></a>
+                    </Link>
+                    <ExternalLinkIcon />
+                  </Button>
+                </GridItem>
+              </Grid>
             )}
-          </FormControl>
+          </Alert>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isOpen}
+        size={'xl'}
+        onClose={() => {
+          setDepositLoader(false)
+          onClose()
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Your private note</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Please back up your note. You will need it later to withdraw your
+            deposit. Treat your note as a private key - never share it with
+            anyone, including zkpooltogether.co developers.
+            <Code
+              style={{ margin: 20 }}
+              colorScheme="#fc6643"
+              children={note}
+            ></Code>
+            <Checkbox>I have backed up the note</Checkbox>
+          </ModalBody>
 
-          <Button
-            colorScheme={'orange'}
-            bg={'#fc6643'}
-            px={6}
-            _hover={{
-              bg: 'orange.390',
-            }}
-            style={{ marginTop: '20%' }}
-            width="100%"
-            isLoading={withdrawLoader}
-            loadingText="Withdrawing"
-            onClick={() => {
-              setWithdrawLoader(true)
-              onWithdraw()
-            }}
-          >
-            Withdraw
-          </Button>
-        </GridItem>
-
-        <Modal
-          isOpen={isAlertOpen}
-          size={'xl'}
-          onClose={() => {
-            onIsAlertClose()
-          }}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <Alert
-              // @ts-ignore
-              status={alert.type}
-              variant="subtle"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              textAlign="center"
-              height="200px"
+          <ModalFooter>
+            <Button
+              px={6}
+              mr={3}
+              onClick={() => {
+                navigator.clipboard.writeText(note)
+              }}
             >
-              <AlertIcon boxSize="40px" mr={0} />
-              <Box>
-                <AlertTitle mt={4} mb={1} fontSize="lg">
-                  {alert.title}
-                </AlertTitle>
-                <AlertDescription maxWidth="md">
-                  {alert.message}
-                </AlertDescription>
-              </Box>
-              {alert.type === 'success' && (
-                <Grid margin="2" templateColumns="repeat(2, 1fr)" gap={6}>
-                  <GridItem>
-                    <Button
-                      onClick={() => {
-                        navigator.clipboard.writeText(alert.message)
-                      }}
-                    >
-                      {' '}
-                      <CopyIcon />{' '}
-                    </Button>
-                  </GridItem>
-                  <GridItem>
-                    <Button>
-                      <Link href={alert.message}>
-                        <a target="_blank"></a>
-                      </Link>
-                      <ExternalLinkIcon />
-                    </Button>
-                  </GridItem>
-                </Grid>
-              )}
-            </Alert>
-          </ModalContent>
-        </Modal>
-        <Modal
-          isOpen={isOpen}
-          size={'xl'}
-          onClose={() => {
-            setDepositLoader(false)
-            onClose()
-          }}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Your private note</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              Please back up your note. You will need it later to withdraw your
-              deposit. Treat your note as a private key - never share it with
-              anyone, including zkpooltogether.co developers.
-              <Code
-                style={{ margin: 20 }}
-                colorScheme="#fc6643"
-                children={note}
-              ></Code>
-              <Checkbox>I have backed up the note</Checkbox>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                px={6}
-                mr={3}
-                onClick={() => {
-                  navigator.clipboard.writeText(note)
-                }}
-              >
-                {' '}
-                <CopyIcon />{' '}
-              </Button>
-              <Button
-                px={6}
-                _hover={{
-                  bg: 'orange.390',
-                }}
-                mr={3}
-                onClick={() => {
-                  setDepositLoader(false)
-                  onClose()
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                px={6}
-                _hover={{
-                  bg: 'orange.390',
-                }}
-                isLoading={sendDepositLoader}
-                loadingText="Depositing..."
-                onClick={async () => {
-                  setSendDepositLoader(true)
-                  await onDepositTransaction()
-                }}
-              >
-                Deposit
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </Grid>
+              {' '}
+              <CopyIcon />{' '}
+            </Button>
+            <Button
+              px={6}
+              _hover={{
+                bg: 'orange.390',
+              }}
+              mr={3}
+              onClick={() => {
+                setDepositLoader(false)
+                onClose()
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              px={6}
+              _hover={{
+                bg: 'orange.390',
+              }}
+              isLoading={sendDepositLoader}
+              loadingText="Depositing..."
+              onClick={async () => {
+                setSendDepositLoader(true)
+                await onDepositTransaction()
+              }}
+            >
+              Deposit
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   )
 }

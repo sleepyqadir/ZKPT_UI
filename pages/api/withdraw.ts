@@ -18,14 +18,25 @@ import POOL_ABI from '../../contracts/Pool.json';
 import { getAddress } from '../../util';
 
 export default async (req, res) => {
-  const {
-    body: { proof, args },
-  } = req;
+  try {
+    const {
+      body: { proof, args },
+    } = req;
 
-  const contract = new Contract(getAddress(), POOL_ABI, signer);
+    const contract = new Contract(getAddress(), POOL_ABI, signer);
 
-  const tx = await contract.withdraw(proof, ...args, {});
-  const txReciept = await tx.wait();
-  console.log({ txReciept });
-  res.json(txReciept);
+    console.log(...[...args.slice(2, 7)], args[0]);
+
+    const tx = await contract.withdraw(
+      proof,
+      ...[...args.slice(2, 7), args[0]],
+      {}
+    );
+    const txReciept = await tx.wait();
+    console.log({ txReciept });
+    res.json(txReciept);
+  } catch (err) {
+    console.log({ err });
+    res.json(err);
+  }
 };
