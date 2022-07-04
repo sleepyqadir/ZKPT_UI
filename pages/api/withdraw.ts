@@ -27,6 +27,8 @@ export default async (req, res) => {
 
     console.log(...[...args.slice(2, 7)], args[0]);
 
+    console.log('testing');
+
     const tx = await contract.withdraw(
       proof,
       ...[...args.slice(2, 7), args[0]],
