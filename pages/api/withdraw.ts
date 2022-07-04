@@ -1,24 +1,5 @@
 import { Contract } from '@ethersproject/contracts';
-const {
-  DefenderRelaySigner,
-  DefenderRelayProvider,
-} = require('defender-relay-client/lib/ethers');
-
-const credentials = {
-  apiKey: process.env.DEFENDER_API_KEY,
-  apiSecret: process.env.DEFENDER_SECRET_KEY,
-};
-const provider = new DefenderRelayProvider(credentials);
-
-import { Relayer } from 'defender-relay-client';
-const relayer = new Relayer({
-  apiKey: credentials.apiKey,
-  apiSecret: credentials.apiSecret,
-});
-
-const signer = new DefenderRelaySigner(credentials, provider, {
-  validForSeconds: 120,
-});
+import { ethers } from 'ethers';
 
 import POOL_ABI from '../../contracts/Pool.json';
 import { getAddress, withdraw } from '../../util';
@@ -29,29 +10,31 @@ export default async (req, res) => {
       body: { proof, args },
     } = req;
 
-    const contract = new Contract(getAddress(), POOL_ABI, signer);
-
-    const data = await contract.populateTransaction.withdraw(
-      proof,
-      ...[...args.slice(2, 7), args[0]]
+    const provider = new ethers.providers.JsonRpcProvider(
+      'https://eth-rinkeby.alchemyapi.io/v2/VmxWigXMpDjAERj9JssUE_MNmC_NnbMX'
     );
 
-    console.log(data);
+    console.log({ provider });
+
+    const signer = new ethers.Wallet(process.env.WALLET, provider);
+
+    console.log({ signer });
+
+    const contract = new Contract(getAddress(), POOL_ABI, signer);
 
     console.log(...[...args.slice(2, 7)], args[0]);
 
-    console.log('testing');
+    const tx = await contract.withdraw(
+      proof,
+      ...[...args.slice(2, 7), args[0]],
+      {}
+    );
 
-    const tx = await relayer.sendTransaction({
-      to: data.to,
-      data: data.data,
-      speed: 'fast',
-      gasLimit: 100000,
-    });
-    console.log({ tx });
+    const data = await tx.wait();
 
-    console.log({ tx });
-    res.json(tx);
+    console.log({ data });
+
+    res.json(data);
   } catch (err) {
     console.log({ err });
     res.json(err);

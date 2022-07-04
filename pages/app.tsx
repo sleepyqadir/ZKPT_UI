@@ -126,7 +126,7 @@ function App() {
 
   const onDepositTransaction = async () => {
     setDepositLoader(false)
-    const alert = await depositEth(deposit, contract,draw)
+    const alert = await depositEth(deposit, contract, draw)
     setSendDepositLoader(false)
     setAlert(alert)
     onIsAlertOpen()

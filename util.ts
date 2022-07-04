@@ -182,12 +182,6 @@ export const depositEth = async (deposit: Deposit, contract: Pool, draw) => {
         title: 'Network Errr',
         message: 'the selected network is not supported yet try [rinkeby]',
       };
-    } else if (parseInt(draw)! == currentDraw) {
-      return {
-        type: 'error',
-        title: 'Draw Id',
-        message: `the draw ${draw} is ended please create new note for drawId ${currentDraw}`,
-      };
     } else {
       const commitment = deposit.commitment;
       const nullifierHash = deposit.nullifierHash;
