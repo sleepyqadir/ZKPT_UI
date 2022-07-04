@@ -23,10 +23,17 @@ export default async (req, res) => {
 
     console.log(...[...args.slice(2, 7), args[0]]);
 
+    const maxFeePerGas = ethers.utils.parseUnits(60 + '', 'gwei');
+    const maxPriorityFeePerGas = ethers.utils.parseUnits(57 + '', 'gwei');
+
     const tx = await contract.winning(
       proof,
       ...[...args.slice(2, 7), args[0]],
-      {}
+      {
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        gasLimit: 10000000,
+      }
     );
     const txReciept = await tx.wait();
     console.log({ txReciept });
