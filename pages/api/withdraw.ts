@@ -35,10 +35,15 @@ export default async (req, res) => {
 
     console.log({ proof });
 
+    console.log({ contract });
+
     const tx = await contract.withdraw(
       proof,
       ...[...args.slice(2, 7), args[0]],
-      {}
+      {
+        speed: 'fast',
+        gasLimit: 100000,
+      }
     );
 
     console.log({ tx });
