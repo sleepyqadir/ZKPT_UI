@@ -61,7 +61,7 @@ const successTemp = {
   type: 'success',
   title: 'sucesss',
   message:
-    'https://rinkeby.etherscan.io/tx/0x2b306ca659344eb234c01caaa6fa7d2958b33abeeeff42e1e078d88c535f572e',
+    'https://polygonscan.com/tx/0x2b306ca659344eb234c01caaa6fa7d2958b33abeeeff42e1e078d88c535f572e',
 }
 
 function App() {
@@ -100,7 +100,7 @@ function App() {
     try {
       const balance = await await contract.provider.getBalance(account)
       // @ts-ignore
-      if (balance.toString() / 1e18 < 0.1) {
+      if (balance.toString() / 1e18 < 1) {
         setAlert({
           type: 'error',
           title: 'Insufficient Balance',
@@ -146,7 +146,7 @@ function App() {
       {!isSupportedNetwork(chainId) && (
         <Alert status="error">
           <AlertIcon />
-          The current selected network is not supported switch to rinkeby
+          The current selected network is not supported switch to polygon
         </Alert>
       )}{' '}
       <Container
@@ -179,7 +179,7 @@ function App() {
                     Draw ID<h2>{draw}</h2>
                   </div>
                   <div className="wp">
-                    Curr<h2>ETH</h2>
+                    Curr<h2>Matic</h2>
                   </div>
                   <div className="wp">
                     Entry<h2>{denomination}</h2>
@@ -187,7 +187,7 @@ function App() {
                 </div>
                 <div className="total clearfix">
                   <h2>
-                    Total : <p>0.01 ETH</p>
+                    Total : <p>1 Matic</p>
                   </h2>
                 </div>
               </div>

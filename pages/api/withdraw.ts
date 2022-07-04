@@ -11,7 +11,7 @@ export default async (req, res) => {
     } = req;
 
     const provider = new ethers.providers.JsonRpcProvider(
-      'https://eth-rinkeby.alchemyapi.io/v2/VmxWigXMpDjAERj9JssUE_MNmC_NnbMX'
+      'https://polygon-mainnet.g.alchemy.com/v2/ZtJ_Tilj4-DWyigjZhIdQImHwkaljIYi'
     );
 
     console.log({ provider });
@@ -22,12 +22,18 @@ export default async (req, res) => {
 
     const contract = new Contract(getAddress(), POOL_ABI, signer);
 
-    console.log(...[...args.slice(2, 7)], args[0]);
+    console.log(...[...args.slice(2, 7)], args[0], proof);
+    const maxFeePerGas = ethers.utils.parseUnits(60 + '', 'gwei');
+    const maxPriorityFeePerGas = ethers.utils.parseUnits(57 + '', 'gwei');
 
     const tx = await contract.withdraw(
       proof,
       ...[...args.slice(2, 7), args[0]],
-      {}
+      {
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        gasLimit: 10000000,
+      }
     );
 
     const data = await tx.wait();

@@ -61,6 +61,7 @@ export default function Statistics() {
     setUsers(users)
     const draws = await contract.currentDrawId()
     const poolBalance = await contract.getBalance()
+    console.log({ poolBalance })
     setPoolBalance(parseInt(poolBalance.toString()) / 1e18)
     setDrawsCount(parseInt(draws.toString()) + 1)
   }

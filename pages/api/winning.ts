@@ -10,7 +10,7 @@ export default async (req, res) => {
   } = req;
   try {
     const provider = new ethers.providers.JsonRpcProvider(
-      'https://eth-rinkeby.alchemyapi.io/v2/VmxWigXMpDjAERj9JssUE_MNmC_NnbMX'
+      'https://polygon-mainnet.g.alchemy.com/v2/ZtJ_Tilj4-DWyigjZhIdQImHwkaljIYi'
     );
 
     console.log({ provider });

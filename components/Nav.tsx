@@ -58,7 +58,7 @@ export default function Nav({ page }: NavProps) {
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={7}>
-              {typeof account === 'string' && chainId === 4 && (
+              {typeof account === 'string' && chainId === 137 && (
                 <Button onClick={() => router.push(`/${page.toLowerCase()}`)}>
                   {page}
                 </Button>
