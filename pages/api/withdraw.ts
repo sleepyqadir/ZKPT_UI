@@ -10,10 +10,7 @@ const credentials = {
 };
 const provider = new DefenderRelayProvider(credentials);
 
-const signer = new DefenderRelaySigner(credentials, provider, {
-  speed: 'fast',
-  validForSeconds: 600,
-});
+const signer = new DefenderRelaySigner(credentials, provider);
 
 import POOL_ABI from '../../contracts/Pool.json';
 import { getAddress } from '../../util';
@@ -24,19 +21,9 @@ export default async (req, res) => {
       body: { proof, args },
     } = req;
 
-    console.log({ credentials });
-
-    console.log({ provider });
-
-    console.log({ signer });
-
     const contract = new Contract(getAddress(), POOL_ABI, signer);
 
     console.log(...[...args.slice(2, 7)], args[0]);
-
-    console.log({ proof });
-
-    console.log({ contract });
 
     const tx = await contract.withdraw(
       proof,

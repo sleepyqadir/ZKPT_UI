@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST={"../hooks/useMetaMaskOnboarding.ts -> @metamask/onboarding":{id:8054,files:["static/chunks/54.8b613ca4b6fcf678.js"]}};
