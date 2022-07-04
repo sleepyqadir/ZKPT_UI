@@ -10,7 +10,9 @@ const credentials = {
 };
 const provider = new DefenderRelayProvider(credentials);
 
-const signer = new DefenderRelaySigner(credentials, provider);
+const signer = new DefenderRelaySigner(credentials, provider, {
+  validForSeconds: 120,
+});
 
 import POOL_ABI from '../../contracts/Pool.json';
 import { getAddress } from '../../util';
