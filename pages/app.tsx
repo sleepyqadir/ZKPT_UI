@@ -161,10 +161,10 @@ function App() {
         {typeof account === 'string' ? (
           <>
             <Box maxW="32rem">
-              <Heading mb={4} style={{ textAlign: 'center' }}>
-                Buy Ticket
+              <Heading mb={4} style={{ fontSize: '24px', textAlign: 'center' }}>
+                {`Buy Ticket For Draw ${draw}`}
               </Heading>
-              <Text fontSize="xl" style={{ textAlign: 'center' }}>
+              <Text fontSize="md" style={{ textAlign: 'center' }}>
                 Buy ticket and pick a random blind guess to become part of
                 current draw. At the end of the draw a random number is selected
                 through VRF to pick the user.
@@ -219,9 +219,7 @@ function App() {
             </Flex>
             <FormControl>
               {' '}
-              <FormHelperText>
-                select your blind random number guess
-              </FormHelperText>
+              <FormHelperText>select your random number guess</FormHelperText>
             </FormControl>
 
             <Button

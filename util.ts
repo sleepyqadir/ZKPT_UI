@@ -247,6 +247,8 @@ export const withdraw = async (
       }),
     });
 
+    console.log(response, response.json());
+
     const txResponse = await response.json();
 
     console.log({ txResponse });
@@ -261,7 +263,7 @@ export const withdraw = async (
       return {
         type: 'error',
         title: 'Something went wrong',
-        message: 'Something went wrong ',
+        message: 'Something went wrong',
       };
     }
   } catch (err) {

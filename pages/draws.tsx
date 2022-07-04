@@ -27,8 +27,9 @@ function Draw() {
 
   const getStats = async () => {
     const draws = await contract.getDraws()
-    console.log(draws)
-    setDraws(draws)
+    const drawReverse = [...draws].reverse()
+    console.log(drawReverse[0].endTime.toString())
+    setDraws(drawReverse)
   }
 
   // useEffect(() => {
