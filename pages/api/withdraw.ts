@@ -23,6 +23,12 @@ export default async (req, res) => {
       body: { proof, args },
     } = req;
 
+    console.log({ credentials });
+
+    console.log({ provider });
+
+    console.log({ signer });
+
     const contract = new Contract(getAddress(), POOL_ABI, signer);
 
     console.log(...[...args.slice(2, 7)], args[0]);
@@ -34,6 +40,8 @@ export default async (req, res) => {
       ...[...args.slice(2, 7), args[0]],
       {}
     );
+
+    console.log({ tx });
 
     const txReciept = await tx.wait();
 

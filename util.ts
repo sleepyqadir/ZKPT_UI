@@ -263,7 +263,7 @@ export const withdraw = async (
       return {
         type: 'error',
         title: 'Something went wrong',
-        message: 'Something went wrong',
+        message: txResponse.reason ? txResponse.reason : "Something went wrong please try again!" ,
       };
     }
   } catch (err) {
