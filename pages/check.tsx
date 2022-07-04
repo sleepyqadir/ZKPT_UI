@@ -20,18 +20,21 @@ import {
   AlertTitle,
   AlertDescription,
   FormErrorMessage,
+  Stack,
 } from '@chakra-ui/react'
-import { checkBlindGuess, getAddress, withdraw, winning } from '../util';
+import { checkBlindGuess, getAddress, withdraw, winning } from '../util'
 import { useState } from 'react'
-import { useRouter } from 'next/router'
 import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import Link from 'next/link'
 import { ethers } from 'ethers'
 import useZKPoolContract from '../hooks/useZkPoolContract'
+import { useWindowSize } from 'react-use'
+import Confetti from 'react-confetti'
+import { useRouter } from 'next/router'
 
 const Message = {
   title: 'title',
-  msg: 'message',
+  msg: 'Enter your note to check for this draw',
   type: '',
   status: false,
   won: false,
@@ -54,7 +57,7 @@ function Check() {
   const [withdrawAddress, setWithdrawAddress] = useState('')
 
   const contract = useZKPoolContract(getAddress())
-
+  const { width, height } = useWindowSize()
   const onWithdraw = async () => {
     try {
       if (!ethers.utils.isAddress(withdrawAddress)) {
@@ -62,8 +65,9 @@ function Check() {
         setIsAddressError(true)
         return
       }
+      let alert
       if (message.won) {
-        const alert = await winning(
+        alert = await winning(
           title,
           random,
           withdrawNote,
@@ -71,7 +75,7 @@ function Check() {
           contract,
         )
       } else {
-        const alert = await withdraw(
+        alert = await withdraw(
           title,
           random,
           withdrawNote,
@@ -82,6 +86,7 @@ function Check() {
       setWithdrawLoader(false)
       // @ts-ignore
       setAlert(alert)
+      
       onIsAlertOpen()
     } catch (err) {
       setWithdrawLoader(false)
@@ -123,29 +128,6 @@ function Check() {
     }
   }
 
-  // const onWithdraw = async () => {
-  //   try {
-  //     if (!ethers.utils.isAddress(withdrawAddress)) {
-  //       setWithdrawLoader(false)
-  //       setIsAddressError(true)
-  //       return
-  //     }
-  //     const alert = await withdrawWinning(
-  //       title,
-  //       withdrawNote,
-  //       withdrawAddress,
-  //       contract,
-  //     )
-  //     setWithdrawLoader(false)
-  //     // @ts-ignore
-  //     setAlert(alert)
-  //     onIsAlertOpen()
-  //   } catch (err) {
-  //     setWithdrawLoader(false)
-  //     console.log({ err })
-  //   }
-  // }
-
   return (
     <Container
       style={{
@@ -164,7 +146,6 @@ function Check() {
         }}
         maxW="500px"
       >
-        {' '}
         <Box maxW="32rem">
           <Heading mb={4} style={{ textAlign: 'center' }}>
             {!isEligible ? `Draw: ${title}` : `🎉 You Won 🎉`}
@@ -226,24 +207,43 @@ function Check() {
               )}
             </FormControl>{' '}
             {/* TODO add the try another button here */}
-            <Button
-              colorScheme={'orange'}
-              bg={'#fc6643'}
-              px={6}
-              _hover={{
-                bg: 'orange.390',
-              }}
-              style={{ marginTop: '10%' }}
-              width="100%"
-              isLoading={withdrawLoader}
-              loadingText="Withdrawing"
-              onClick={() => {
-                setWithdrawLoader(true)
-                onWithdraw()
-              }}
-            >
-              Withdraw
-            </Button>{' '}
+            <Stack direction={'row'} spacing={7}>
+              <Button
+                colorScheme={'orange'}
+                bg={'#fc6643'}
+                px={6}
+                _hover={{
+                  bg: 'orange.390',
+                }}
+                style={{ marginTop: '10%' }}
+                width="100%"
+                isLoading={withdrawLoader}
+                loadingText="Withdrawing"
+                onClick={() => {
+                  setWithdrawLoader(true)
+                  onWithdraw()
+                }}
+              >
+                Withdraw
+              </Button>{' '}
+              <Button
+                colorScheme={'orange'}
+                bg={'#fc6643'}
+                px={6}
+                _hover={{
+                  bg: 'orange.390',
+                }}
+                style={{ marginTop: '10%' }}
+                width="100%"
+                onClick={() => {
+                  setIsEligible(false)
+                  setMessage(Message)
+                  setWithdrawAddress('')
+                }}
+              >
+                Try Another
+              </Button>
+            </Stack>
           </>
         )}
       </Container>

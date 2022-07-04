@@ -17,7 +17,8 @@ import Network from './Network'
 import { Router } from 'next/router'
 // import ETHBalance from './ETHBalance'
 import { useRouter } from 'next/router'
-
+import logo from '../public/images/logo.png'
+import Image from 'next/image'
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
     px={2}
@@ -48,7 +49,11 @@ export default function Nav({ page }: NavProps) {
       <Box px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <Box>
-            <h1>ZKPT</h1>
+            <Image
+              width="135"
+              height="135"
+              src={require('../public/images/logo.png')}
+            />
           </Box>
 
           <Flex alignItems={'center'}>

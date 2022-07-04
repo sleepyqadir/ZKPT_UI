@@ -246,16 +246,21 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "drawId",
+        name: "index",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "index",
+        name: "_minutes",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "reward",
         type: "uint256",
       },
     ],
-    name: "_triggerDrawEnd",
+    name: "_triggerDraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -313,6 +318,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "deposits",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -349,7 +367,7 @@ const _abi = [
       },
       {
         internalType: "uint256",
-        name: "amount",
+        name: "reward",
         type: "uint256",
       },
       {
@@ -375,6 +393,19 @@ const _abi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -413,7 +444,7 @@ const _abi = [
           },
           {
             internalType: "uint256",
-            name: "amount",
+            name: "reward",
             type: "uint256",
           },
           {
@@ -478,19 +509,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_minutes",
-        type: "uint256",
-      },
-    ],
-    name: "initDraw",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -616,6 +634,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "reserves",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -648,8 +679,14 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "triggerDrawEnd",
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_minutes",
+        type: "uint256",
+      },
+    ],
+    name: "triggerDraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

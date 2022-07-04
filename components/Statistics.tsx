@@ -54,13 +54,23 @@ export default function Statistics() {
 
   const [users, setUsers] = useState(0)
   const [drawsCount, setDrawsCount] = useState(0)
+  const [poolBalance, setPoolBalance] = useState(0)
 
   const getStats = async () => {
     const users = await contract.nextIndex()
     setUsers(users)
     const draws = await contract.currentDrawId()
+    const poolBalance = await contract.getBalance()
+    setPoolBalance(parseInt(poolBalance.toString()) / 1e18)
     setDrawsCount(parseInt(draws.toString()) + 1)
   }
+
+  // useEffect(() => {
+  //   contract && getStats()
+  //   setTimeout(() => {
+  //     contract && getStats()
+  //   }, 1000 * 30)
+  // }, [contract])
 
   useEffect(() => {
     contract && getStats()
@@ -68,7 +78,7 @@ export default function Statistics() {
 
   return (
     <Box maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
         <StatsCard
           title={'Users'}
           // @ts-ignore
@@ -81,12 +91,12 @@ export default function Statistics() {
           stat={drawsCount}
           icon={<FiServer size={'3em'} />}
         />
-        {/* <StatsCard
-          title={'Total Winning'}
+        <StatsCard
+          title={'Strategy Pool'}
           // @ts-ignore
-          stat={drawsCount * 0.001}
-          icon={<FiDollarSign size={'3em'} />}
-        /> */}
+          stat={poolBalance}
+          icon={<p>ETH</p>}
+        />
       </SimpleGrid>
     </Box>
   )

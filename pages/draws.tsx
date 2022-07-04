@@ -22,8 +22,16 @@ function Draw() {
 
   const getStats = async () => {
     const draws = await contract.getDraws()
+    console.log(draws)
     setDraws(draws)
   }
+
+  // useEffect(() => {
+  //   contract && getStats()
+  //   setTimeout(() => {
+  //     contract && getStats()
+  //   }, 1000 * 30)
+  // }, [contract])
 
   useEffect(() => {
     contract && getStats()

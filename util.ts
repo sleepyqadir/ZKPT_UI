@@ -31,7 +31,6 @@ const ETHERSCAN_PREFIXES = {
   42: 'kovan',
 };
 
-// TODO take the guess number from the users
 export const createDeposit = async (
   nullifier = ethers.utils.randomBytes(15),
   secret = ethers.utils.randomBytes(15),
@@ -42,20 +41,27 @@ export const createDeposit = async (
   return deposit;
 };
 
-export const generateNote = async (deposit: Deposit) => {
+export const generateNote = async (deposit: Deposit, draw: number) => {
   const AMOUNT = '0.1';
-  const netId = deposit.guess;
-  return `zkpt-eth-${AMOUNT}-${netId}-0x${deposit.nullifier}0x${deposit.secret}`;
+  const guess = deposit.guess;
+  return `zkpt-eth-${AMOUNT}-${guess}-${draw}-0x${deposit.nullifier}-0x${deposit.secret}`;
 };
 
 export const parseNote = async (noteString) => {
   try {
     const noteArray = noteString.split('0x');
+    console.log({ noteArray });
     const noteRegex = /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)/g;
     const match = noteRegex.exec(noteArray[0]);
-    const bytesArrayNullifier = noteArray[1].split(',').map((x) => +x);
+    const bytesArrayNullifier = noteArray[1]
+      .replace('-', '')
+      .split(',')
+      .map((x) => +x);
     const nullifier = new Uint8Array(bytesArrayNullifier);
-    const bytesArraySecret = noteArray[2].split(',').map((x) => +x);
+    const bytesArraySecret = noteArray[2]
+      .replace('-', '')
+      .split(',')
+      .map((x) => +x);
     const secret = new Uint8Array(bytesArraySecret);
     return createDeposit(nullifier, secret, parseInt(match[3]));
   } catch (err) {
@@ -250,7 +256,7 @@ export const withdraw = async (
       return {
         type: 'error',
         title: 'Something went wrong',
-        message: txResponse,
+        message: 'Something went wrong ',
       };
     }
   } catch (err) {
@@ -443,7 +449,7 @@ export const isSupportedNetwork = (id: number): boolean => {
 };
 
 export const getAddress = () => {
-  return '0x021999a5E1487120180b7219B1302f6083DD9fEC';
+  return '0xd99A6aCb6Ee70a2CedBcA15B6f7c5A165509bb68';
 };
 
 export const checkBlindGuess = async (note: string, random: any) => {

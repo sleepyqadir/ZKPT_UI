@@ -44,17 +44,22 @@ import {
   withdraw,
   getAddress,
 } from '../util'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useWeb3React } from '@web3-react/core'
-import { ethers } from 'ethers'
 import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import Link from 'next/link'
-
 const alertTemp = {
   type: 'error',
   title: 'title',
   message: 'message',
+}
+
+const successTemp = {
+  type: 'sucess',
+  title: 'sucesss',
+  message:
+    'https://rinkeby.etherscan.io/tx/0x2b306ca659344eb234c01caaa6fa7d2958b33abeeeff42e1e078d88c535f572e',
 }
 
 function App() {
@@ -65,14 +70,28 @@ function App() {
     onClose: onIsAlertClose,
   } = useDisclosure()
   const contract = useZKPoolContract(getAddress())
-  const { account } = useWeb3React()
+  const { account, chainId } = useWeb3React()
   const [note, setNote] = useState('')
   const [deposit, setDeposit] = useState(null)
   const [depositLoader, setDepositLoader] = useState(false)
   const [sendDepositLoader, setSendDepositLoader] = useState(false)
   const [alert, setAlert] = useState(alertTemp)
   const [value, setValue] = useState(0)
+  const [draw, setDraw] = useState(0)
+  const [denomination, setDenomination] = useState(0)
 
+  const getDrawNo = async () => {
+    let draw: number = (await contract.currentDrawId()).toNumber()
+    let denomination: number =
+      parseInt((await contract.denomination()).toString()) / 1e18
+    setDraw(draw)
+    
+    setDenomination(denomination)
+  }
+
+  useEffect(() => {
+    contract && getDrawNo()
+  }, [contract])
   const handleChange = (value) => setValue(value)
 
   const onDeposit = async () => {
@@ -92,7 +111,8 @@ function App() {
         onOpen()
         const newDeposit = await createDeposit(undefined, undefined, value)
         setDeposit(newDeposit)
-        const depositNote = await generateNote(newDeposit)
+        let draw: number = (await contract.currentDrawId()).toNumber()
+        const depositNote = await generateNote(newDeposit, draw)
         setNote(depositNote)
       }
     } catch (err) {
@@ -115,6 +135,7 @@ function App() {
       style={{
         height: '100vh',
         backgroundPosition: 'center',
+        marginTop: '20px',
       }}
       maxW="1200px"
     >
@@ -129,82 +150,98 @@ function App() {
         }}
         maxW="600px"
       >
-        <Box maxW="32rem">
-          <Heading mb={4} style={{ textAlign: 'center' }}>
-            Buy Ticket
-          </Heading>
-          <Text fontSize="xl" style={{ textAlign: 'center' }}>
-            Buy ticket and pick a random blind guess to become part of current
-            draw. At the end of the draw a random number is selected through VRF
-            to pick the user.
-          </Text>
-        </Box>
-        <div className="box">
-          <div className="inner">
-            <h1>ZKPoolTogether 2022</h1>
-            <div className="info clearfix">
-              <div className="wp">
-                Draw No<h2>1</h2>
-              </div>
-              <div className="wp">
-                Curr<h2>ETH</h2>
-              </div>
-              <div className="wp">
-                Prize<h2>0.01</h2>
+        {typeof account === 'string' ? (
+          <>
+            <Box maxW="32rem">
+              <Heading mb={4} style={{ textAlign: 'center' }}>
+                Buy Ticket
+              </Heading>
+              <Text fontSize="xl" style={{ textAlign: 'center' }}>
+                Buy ticket and pick a random blind guess to become part of
+                current draw. At the end of the draw a random number is selected
+                through VRF to pick the user.
+              </Text>
+            </Box>
+            <div className="box">
+              <div className="inner">
+                <h1>ZKPoolTogether 2022</h1>
+                <div className="info clearfix">
+                  <div className="wp">
+                    Draw ID<h2>{draw}</h2>
+                  </div>
+                  <div className="wp">
+                    Curr<h2>ETH</h2>
+                  </div>
+                  <div className="wp">
+                    Entry<h2>{denomination}</h2>
+                  </div>
+                </div>
+                <div className="total clearfix">
+                  <h2>
+                    Total : <p>0.01 ETH</p>
+                  </h2>
+                </div>
               </div>
             </div>
-            <div className="total clearfix">
-              <h2>
-                Total : <p>0.01 ETH</p>
-              </h2>
-            </div>
-          </div>
-        </div>
 
-        <Flex>
-          <NumberInput
-            maxW="100px"
-            style={{ marginTop: '5%' }}
-            value={value}
-            onChange={handleChange}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Slider
-            flex="1"
-            focusThumbOnChange={false}
-            value={value}
-            onChange={handleChange}
-          >
-            <SliderTrack>
-              <SliderFilledTrack />
-            </SliderTrack>
-            <SliderThumb fontSize="sm" boxSize="32px" children={value} />
-          </Slider>
-        </Flex>
+            <Flex style={{ marginTop: '5%' }}>
+              <NumberInput
+                style={{ marginRight: '4%' }}
+                maxW="80px"
+                value={value}
+                onChange={handleChange}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Slider
+                flex="1"
+                focusThumbOnChange={false}
+                value={value}
+                onChange={handleChange}
+              >
+                <SliderTrack>
+                  <SliderFilledTrack />
+                </SliderTrack>
+                <SliderThumb fontSize="sm" boxSize="24px" children={value} />
+              </Slider>
+            </Flex>
+            <FormControl>
+              {' '}
+              <FormHelperText>
+                select your blind random number guess
+              </FormHelperText>
+            </FormControl>
 
-        <Button
-          colorScheme={'orange'}
-          bg={'#fc6643'}
-          px={6}
-          _hover={{
-            bg: 'orange.390',
-          }}
-          style={{ marginTop: '5%' }}
-          width="100%"
-          isLoading={depositLoader}
-          loadingText="Buying"
-          onClick={() => {
-            setDepositLoader(true)
-            onDeposit()
-          }}
-        >
-          Buy
-        </Button>
+            <Button
+              colorScheme={'orange'}
+              bg={'#fc6643'}
+              px={6}
+              _hover={{
+                bg: 'orange.390',
+              }}
+              style={{ marginTop: '5%' }}
+              width="100%"
+              isLoading={depositLoader}
+              loadingText="Buying"
+              onClick={() => {
+                setDepositLoader(true)
+                onDeposit()
+              }}
+            >
+              Buy
+            </Button>
+          </>
+        ) : (
+          <Box maxW="32rem">
+            <Heading mb={4} style={{ textAlign: 'center', marginTop: '45%' }}>
+              Connect Your Wallet To Buy Ticket!
+            </Heading>
+          </Box>
+        )}
       </Container>
 
       <Modal
@@ -272,8 +309,9 @@ function App() {
           <ModalCloseButton />
           <ModalBody>
             Please back up your note. You will need it later to withdraw your
-            deposit. Treat your note as a private key - never share it with
-            anyone, including zkpooltogether.co developers.
+            deposit amount or to clame the winning amount. Treat your note as a
+            private key - never share it with anyone, including zkpooltogether
+            developers.
             <Code
               style={{ margin: 20 }}
               colorScheme="#fc6643"

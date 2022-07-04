@@ -35,7 +35,7 @@ export declare namespace DrawManager {
     endTime: PromiseOrValue<BigNumberish>;
     isCompleted: PromiseOrValue<boolean>;
     isSpent: PromiseOrValue<boolean>;
-    amount: PromiseOrValue<BigNumberish>;
+    reward: PromiseOrValue<BigNumberish>;
     random: PromiseOrValue<BigNumberish>;
   };
 
@@ -53,7 +53,7 @@ export declare namespace DrawManager {
     endTime: BigNumber;
     isCompleted: boolean;
     isSpent: boolean;
-    amount: BigNumber;
+    reward: BigNumber;
     random: BigNumber;
   };
 }
@@ -86,18 +86,19 @@ export interface PoolInterface extends utils.Interface {
     "ROOT_HISTORY_SIZE()": FunctionFragment;
     "WETH()": FunctionFragment;
     "ZERO_VALUE()": FunctionFragment;
-    "_triggerDrawEnd(uint256,uint256)": FunctionFragment;
+    "_triggerDraw(uint256,uint256,uint256)": FunctionFragment;
     "currentDrawId()": FunctionFragment;
     "currentRootIndex()": FunctionFragment;
     "denomination()": FunctionFragment;
     "deposit(bytes32)": FunctionFragment;
+    "deposits()": FunctionFragment;
     "draws(uint256)": FunctionFragment;
     "filledSubtrees(uint256)": FunctionFragment;
+    "getBalance()": FunctionFragment;
     "getDraws()": FunctionFragment;
     "getLastRoot()": FunctionFragment;
     "hashLeftRight(bytes32,bytes32)": FunctionFragment;
     "hasher()": FunctionFragment;
-    "initDraw(uint256)": FunctionFragment;
     "isKnownRoot(bytes32)": FunctionFragment;
     "isSpent(bytes32)": FunctionFragment;
     "levels()": FunctionFragment;
@@ -106,9 +107,10 @@ export interface PoolInterface extends utils.Interface {
     "owner()": FunctionFragment;
     "random(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "reserves()": FunctionFragment;
     "roots(uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "triggerDrawEnd()": FunctionFragment;
+    "triggerDraw(uint256)": FunctionFragment;
     "wethGateway()": FunctionFragment;
     "winning((uint256[2],uint256[2][2],uint256[2]),bytes32,bytes32,address,address,uint256,uint256)": FunctionFragment;
     "winningVerifier()": FunctionFragment;
@@ -124,18 +126,19 @@ export interface PoolInterface extends utils.Interface {
       | "ROOT_HISTORY_SIZE"
       | "WETH"
       | "ZERO_VALUE"
-      | "_triggerDrawEnd"
+      | "_triggerDraw"
       | "currentDrawId"
       | "currentRootIndex"
       | "denomination"
       | "deposit"
+      | "deposits"
       | "draws"
       | "filledSubtrees"
+      | "getBalance"
       | "getDraws"
       | "getLastRoot"
       | "hashLeftRight"
       | "hasher"
-      | "initDraw"
       | "isKnownRoot"
       | "isSpent"
       | "levels"
@@ -144,9 +147,10 @@ export interface PoolInterface extends utils.Interface {
       | "owner"
       | "random"
       | "renounceOwnership"
+      | "reserves"
       | "roots"
       | "transferOwnership"
-      | "triggerDrawEnd"
+      | "triggerDraw"
       | "wethGateway"
       | "winning"
       | "winningVerifier"
@@ -173,8 +177,12 @@ export interface PoolInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "_triggerDrawEnd",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    functionFragment: "_triggerDraw",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "currentDrawId",
@@ -192,6 +200,7 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "deposit",
     values: [PromiseOrValue<BytesLike>]
   ): string;
+  encodeFunctionData(functionFragment: "deposits", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "draws",
     values: [PromiseOrValue<BigNumberish>]
@@ -199,6 +208,10 @@ export interface PoolInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "filledSubtrees",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getBalance",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "getDraws", values?: undefined): string;
   encodeFunctionData(
@@ -210,10 +223,6 @@ export interface PoolInterface extends utils.Interface {
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(functionFragment: "hasher", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "initDraw",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
   encodeFunctionData(
     functionFragment: "isKnownRoot",
     values: [PromiseOrValue<BytesLike>]
@@ -237,6 +246,7 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "reserves", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "roots",
     values: [PromiseOrValue<BigNumberish>]
@@ -246,8 +256,8 @@ export interface PoolInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "triggerDrawEnd",
-    values?: undefined
+    functionFragment: "triggerDraw",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "wethGateway",
@@ -302,7 +312,7 @@ export interface PoolInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ZERO_VALUE", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "_triggerDrawEnd",
+    functionFragment: "_triggerDraw",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -318,11 +328,13 @@ export interface PoolInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "deposits", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "draws", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "filledSubtrees",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getDraws", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getLastRoot",
@@ -333,7 +345,6 @@ export interface PoolInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "hasher", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "initDraw", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isKnownRoot",
     data: BytesLike
@@ -351,13 +362,14 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "reserves", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "roots", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "triggerDrawEnd",
+    functionFragment: "triggerDraw",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -488,9 +500,10 @@ export interface Pool extends BaseContract {
 
     ZERO_VALUE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    _triggerDrawEnd(
-      drawId: PromiseOrValue<BigNumberish>,
+    _triggerDraw(
       index: PromiseOrValue<BigNumberish>,
+      _minutes: PromiseOrValue<BigNumberish>,
+      reward: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -504,6 +517,8 @@ export interface Pool extends BaseContract {
       _commitment: PromiseOrValue<BytesLike>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    deposits(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     draws(
       arg0: PromiseOrValue<BigNumberish>,
@@ -523,7 +538,7 @@ export interface Pool extends BaseContract {
         endTime: BigNumber;
         isCompleted: boolean;
         isSpent: boolean;
-        amount: BigNumber;
+        reward: BigNumber;
         random: BigNumber;
       }
     >;
@@ -532,6 +547,8 @@ export interface Pool extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getDraws(
       overrides?: CallOverrides
@@ -546,11 +563,6 @@ export interface Pool extends BaseContract {
     ): Promise<[string]>;
 
     hasher(overrides?: CallOverrides): Promise<[string]>;
-
-    initDraw(
-      _minutes: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
@@ -582,6 +594,8 @@ export interface Pool extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    reserves(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     roots(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -592,7 +606,8 @@ export interface Pool extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    triggerDrawEnd(
+    triggerDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -640,9 +655,10 @@ export interface Pool extends BaseContract {
 
   ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
-  _triggerDrawEnd(
-    drawId: PromiseOrValue<BigNumberish>,
+  _triggerDraw(
     index: PromiseOrValue<BigNumberish>,
+    _minutes: PromiseOrValue<BigNumberish>,
+    reward: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -656,6 +672,8 @@ export interface Pool extends BaseContract {
     _commitment: PromiseOrValue<BytesLike>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  deposits(overrides?: CallOverrides): Promise<BigNumber>;
 
   draws(
     arg0: PromiseOrValue<BigNumberish>,
@@ -675,7 +693,7 @@ export interface Pool extends BaseContract {
       endTime: BigNumber;
       isCompleted: boolean;
       isSpent: boolean;
-      amount: BigNumber;
+      reward: BigNumber;
       random: BigNumber;
     }
   >;
@@ -684,6 +702,8 @@ export interface Pool extends BaseContract {
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   getDraws(
     overrides?: CallOverrides
@@ -698,11 +718,6 @@ export interface Pool extends BaseContract {
   ): Promise<string>;
 
   hasher(overrides?: CallOverrides): Promise<string>;
-
-  initDraw(
-    _minutes: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
 
   isKnownRoot(
     _root: PromiseOrValue<BytesLike>,
@@ -734,6 +749,8 @@ export interface Pool extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  reserves(overrides?: CallOverrides): Promise<BigNumber>;
+
   roots(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -744,7 +761,8 @@ export interface Pool extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  triggerDrawEnd(
+  triggerDraw(
+    _minutes: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -792,9 +810,10 @@ export interface Pool extends BaseContract {
 
     ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _triggerDrawEnd(
-      drawId: PromiseOrValue<BigNumberish>,
+    _triggerDraw(
       index: PromiseOrValue<BigNumberish>,
+      _minutes: PromiseOrValue<BigNumberish>,
+      reward: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -808,6 +827,8 @@ export interface Pool extends BaseContract {
       _commitment: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    deposits(overrides?: CallOverrides): Promise<BigNumber>;
 
     draws(
       arg0: PromiseOrValue<BigNumberish>,
@@ -827,7 +848,7 @@ export interface Pool extends BaseContract {
         endTime: BigNumber;
         isCompleted: boolean;
         isSpent: boolean;
-        amount: BigNumber;
+        reward: BigNumber;
         random: BigNumber;
       }
     >;
@@ -836,6 +857,8 @@ export interface Pool extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getDraws(
       overrides?: CallOverrides
@@ -850,11 +873,6 @@ export interface Pool extends BaseContract {
     ): Promise<string>;
 
     hasher(overrides?: CallOverrides): Promise<string>;
-
-    initDraw(
-      _minutes: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
@@ -884,6 +902,8 @@ export interface Pool extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
+    reserves(overrides?: CallOverrides): Promise<BigNumber>;
+
     roots(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -894,7 +914,10 @@ export interface Pool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    triggerDrawEnd(overrides?: CallOverrides): Promise<void>;
+    triggerDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     wethGateway(overrides?: CallOverrides): Promise<string>;
 
@@ -990,9 +1013,10 @@ export interface Pool extends BaseContract {
 
     ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _triggerDrawEnd(
-      drawId: PromiseOrValue<BigNumberish>,
+    _triggerDraw(
       index: PromiseOrValue<BigNumberish>,
+      _minutes: PromiseOrValue<BigNumberish>,
+      reward: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1007,6 +1031,8 @@ export interface Pool extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    deposits(overrides?: CallOverrides): Promise<BigNumber>;
+
     draws(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1016,6 +1042,8 @@ export interface Pool extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getDraws(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1028,11 +1056,6 @@ export interface Pool extends BaseContract {
     ): Promise<BigNumber>;
 
     hasher(overrides?: CallOverrides): Promise<BigNumber>;
-
-    initDraw(
-      _minutes: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
@@ -1064,6 +1087,8 @@ export interface Pool extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    reserves(overrides?: CallOverrides): Promise<BigNumber>;
+
     roots(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1074,7 +1099,8 @@ export interface Pool extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    triggerDrawEnd(
+    triggerDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1123,9 +1149,10 @@ export interface Pool extends BaseContract {
 
     ZERO_VALUE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _triggerDrawEnd(
-      drawId: PromiseOrValue<BigNumberish>,
+    _triggerDraw(
       index: PromiseOrValue<BigNumberish>,
+      _minutes: PromiseOrValue<BigNumberish>,
+      reward: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1140,6 +1167,8 @@ export interface Pool extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    deposits(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     draws(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1149,6 +1178,8 @@ export interface Pool extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getDraws(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1161,11 +1192,6 @@ export interface Pool extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     hasher(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    initDraw(
-      _minutes: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
 
     isKnownRoot(
       _root: PromiseOrValue<BytesLike>,
@@ -1197,6 +1223,8 @@ export interface Pool extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    reserves(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     roots(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1207,7 +1235,8 @@ export interface Pool extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    triggerDrawEnd(
+    triggerDraw(
+      _minutes: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
