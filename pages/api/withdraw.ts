@@ -39,11 +39,7 @@ export default async (req, res) => {
 
     const tx = await contract.withdraw(
       proof,
-      ...[...args.slice(2, 7), args[0]],
-      {
-        speed: 'fast',
-        gasLimit: 100000,
-      }
+      ...[...args.slice(2, 7), args[0]]
     );
 
     console.log({ tx });
