@@ -478,6 +478,7 @@ export const checkBlindGuess = async (note: string, random: any, draw: any) => {
         'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
     };
   }
+  console.log(drawId, draw);
   if (drawId !== parseInt(draw)) {
     return {
       type: 'error',
