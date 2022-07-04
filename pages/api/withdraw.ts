@@ -41,7 +41,7 @@ export default async (req, res) => {
     const tx = await contract.withdraw(
       proof,
       ...[...args.slice(2, 7), args[0]],
-      { validUntil: '600' }
+      {}
     );
 
     console.log({ tx });
