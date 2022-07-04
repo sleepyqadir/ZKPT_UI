@@ -1,5 +1,7 @@
 import Nav from '../components/Nav'
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Container,
@@ -12,11 +14,14 @@ import PackageTier from '../components/PackageTier'
 import Statistics from '../components/Statistics'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useState, useEffect } from 'react'
-import { getAddress } from '../util'
+import { getAddress, isSupportedNetwork } from '../util'
 import { ethers } from 'ethers'
+import { useWeb3React } from '@web3-react/core'
 
 function Draw() {
   const contract = useZKPoolContract(getAddress())
+
+  const { account, chainId } = useWeb3React()
 
   const [draws, setDraws] = useState([])
 
@@ -47,6 +52,13 @@ function Draw() {
       maxW="1200px"
     >
       <Nav page={'App'} />
+      {!isSupportedNetwork(chainId) && (
+        <Alert status="error">
+          <AlertIcon />
+          The current selected network is not supported switch to rinkeby to see
+          data
+        </Alert>
+      )}{' '}
       <Statistics />
       <Box py={6} px={5} style={{ minHeight: '100vh' }}>
         <Stack spacing={4} width={'100%'} direction={'column'}>

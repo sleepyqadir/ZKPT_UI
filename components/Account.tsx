@@ -11,13 +11,14 @@ import {
   switchNetwork,
 } from '../util'
 import { Button, Icon } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 type AccountProps = {
   triedToEagerConnect: boolean
 }
 
 const Account = ({ triedToEagerConnect }: AccountProps) => {
   const { active, error, activate, chainId, account, setError } = useWeb3React()
-
+  const router = useRouter()
   const {
     isMetaMaskInstalled,
     isWeb3Available,
@@ -39,8 +40,8 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
   if (error) {
     return (
       <Button
-        onClick={() => {
-          switchNetwork(true)
+        onClick={async () => {
+          const success = await switchNetwork(true)
         }}
       >
         <Icon

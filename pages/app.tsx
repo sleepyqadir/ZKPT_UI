@@ -44,6 +44,7 @@ import {
   withdraw,
   getAddress,
   shortenHex,
+  isSupportedNetwork,
 } from '../util'
 import { useState, useEffect } from 'react'
 import useZKPoolContract from '../hooks/useZkPoolContract'
@@ -141,6 +142,12 @@ function App() {
       maxW="1200px"
     >
       <Nav page={'Draws'} />
+      {!isSupportedNetwork(chainId) && (
+        <Alert status="error">
+          <AlertIcon />
+          The current selected network is not supported switch to rinkeby
+        </Alert>
+      )}{' '}
       <Container
         w="100%"
         h="10"
@@ -244,7 +251,6 @@ function App() {
           </Box>
         )}
       </Container>
-
       <Modal
         isOpen={isAlertOpen}
         size={'xl'}

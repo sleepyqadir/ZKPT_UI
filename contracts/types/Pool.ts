@@ -86,7 +86,7 @@ export interface PoolInterface extends utils.Interface {
     "ROOT_HISTORY_SIZE()": FunctionFragment;
     "WETH()": FunctionFragment;
     "ZERO_VALUE()": FunctionFragment;
-    "_triggerDraw(uint256,uint256,uint256)": FunctionFragment;
+    "_triggerDraw(uint256,uint256,uint256,uint256)": FunctionFragment;
     "currentDrawId()": FunctionFragment;
     "currentRootIndex()": FunctionFragment;
     "denomination()": FunctionFragment;
@@ -110,7 +110,8 @@ export interface PoolInterface extends utils.Interface {
     "reserves()": FunctionFragment;
     "roots(uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "triggerDraw(uint256)": FunctionFragment;
+    "triggerDraw(uint256,bytes32)": FunctionFragment;
+    "vrf(bytes32)": FunctionFragment;
     "wethGateway()": FunctionFragment;
     "winning((uint256[2],uint256[2][2],uint256[2]),bytes32,bytes32,address,address,uint256,uint256)": FunctionFragment;
     "winningVerifier()": FunctionFragment;
@@ -151,6 +152,7 @@ export interface PoolInterface extends utils.Interface {
       | "roots"
       | "transferOwnership"
       | "triggerDraw"
+      | "vrf"
       | "wethGateway"
       | "winning"
       | "winningVerifier"
@@ -179,6 +181,7 @@ export interface PoolInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "_triggerDraw",
     values: [
+      PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
@@ -257,7 +260,11 @@ export interface PoolInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "triggerDraw",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "vrf",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "wethGateway",
@@ -372,6 +379,7 @@ export interface PoolInterface extends utils.Interface {
     functionFragment: "triggerDraw",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "vrf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "wethGateway",
     data: BytesLike
@@ -501,6 +509,7 @@ export interface Pool extends BaseContract {
     ZERO_VALUE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     _triggerDraw(
+      drawId: PromiseOrValue<BigNumberish>,
       index: PromiseOrValue<BigNumberish>,
       _minutes: PromiseOrValue<BigNumberish>,
       reward: PromiseOrValue<BigNumberish>,
@@ -608,8 +617,14 @@ export interface Pool extends BaseContract {
 
     triggerDraw(
       _minutes: PromiseOrValue<BigNumberish>,
+      _entropy: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    vrf(
+      _entropy: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     wethGateway(overrides?: CallOverrides): Promise<[string]>;
 
@@ -656,6 +671,7 @@ export interface Pool extends BaseContract {
   ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
   _triggerDraw(
+    drawId: PromiseOrValue<BigNumberish>,
     index: PromiseOrValue<BigNumberish>,
     _minutes: PromiseOrValue<BigNumberish>,
     reward: PromiseOrValue<BigNumberish>,
@@ -763,8 +779,14 @@ export interface Pool extends BaseContract {
 
   triggerDraw(
     _minutes: PromiseOrValue<BigNumberish>,
+    _entropy: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  vrf(
+    _entropy: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   wethGateway(overrides?: CallOverrides): Promise<string>;
 
@@ -811,6 +833,7 @@ export interface Pool extends BaseContract {
     ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
     _triggerDraw(
+      drawId: PromiseOrValue<BigNumberish>,
       index: PromiseOrValue<BigNumberish>,
       _minutes: PromiseOrValue<BigNumberish>,
       reward: PromiseOrValue<BigNumberish>,
@@ -916,8 +939,14 @@ export interface Pool extends BaseContract {
 
     triggerDraw(
       _minutes: PromiseOrValue<BigNumberish>,
+      _entropy: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    vrf(
+      _entropy: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     wethGateway(overrides?: CallOverrides): Promise<string>;
 
@@ -1014,6 +1043,7 @@ export interface Pool extends BaseContract {
     ZERO_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
     _triggerDraw(
+      drawId: PromiseOrValue<BigNumberish>,
       index: PromiseOrValue<BigNumberish>,
       _minutes: PromiseOrValue<BigNumberish>,
       reward: PromiseOrValue<BigNumberish>,
@@ -1101,7 +1131,13 @@ export interface Pool extends BaseContract {
 
     triggerDraw(
       _minutes: PromiseOrValue<BigNumberish>,
+      _entropy: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    vrf(
+      _entropy: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     wethGateway(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1150,6 +1186,7 @@ export interface Pool extends BaseContract {
     ZERO_VALUE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _triggerDraw(
+      drawId: PromiseOrValue<BigNumberish>,
       index: PromiseOrValue<BigNumberish>,
       _minutes: PromiseOrValue<BigNumberish>,
       reward: PromiseOrValue<BigNumberish>,
@@ -1237,7 +1274,13 @@ export interface Pool extends BaseContract {
 
     triggerDraw(
       _minutes: PromiseOrValue<BigNumberish>,
+      _entropy: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    vrf(
+      _entropy: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     wethGateway(overrides?: CallOverrides): Promise<PopulatedTransaction>;

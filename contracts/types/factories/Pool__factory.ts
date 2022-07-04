@@ -246,6 +246,11 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
+        name: "drawId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
         name: "index",
         type: "uint256",
       },
@@ -685,10 +690,34 @@ const _abi = [
         name: "_minutes",
         type: "uint256",
       },
+      {
+        internalType: "bytes32",
+        name: "_entropy",
+        type: "bytes32",
+      },
     ],
     name: "triggerDraw",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_entropy",
+        type: "bytes32",
+      },
+    ],
+    name: "vrf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "pure",
     type: "function",
   },
   {

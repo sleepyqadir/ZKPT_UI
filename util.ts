@@ -445,7 +445,7 @@ export const isSupportedNetwork = (id: number): boolean => {
     3: false,
     4: true,
     5: false,
-    137: true,
+    137: false,
     1666600000: false,
     1666900000: false,
   };
@@ -454,7 +454,7 @@ export const isSupportedNetwork = (id: number): boolean => {
 };
 
 export const getAddress = () => {
-  return '0xd99A6aCb6Ee70a2CedBcA15B6f7c5A165509bb68';
+  return '0xC8b59e543cc298dECa3965a0d6c8612951bd2F24';
 };
 
 export const checkBlindGuess = async (note: string, random: any, draw: any) => {
@@ -496,8 +496,14 @@ export const switchNetwork = (mainnet: boolean) => {
     // @ts-ignore
     window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x89' }],
+      params: [{ chainId: '0x4' }],
     });
+    return;
   } else {
+    // @ts-ignore
+    window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x4' }],
+    });
   }
 };
