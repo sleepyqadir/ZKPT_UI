@@ -27,12 +27,16 @@ export default async (req, res) => {
 
     console.log(...[...args.slice(2, 7)], args[0]);
 
+    console.log({ proof });
+
     const tx = await contract.withdraw(
       proof,
       ...[...args.slice(2, 7), args[0]],
       {}
     );
+
     const txReciept = await tx.wait();
+
     console.log({ txReciept });
     res.json(txReciept);
   } catch (err) {

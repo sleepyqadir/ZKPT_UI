@@ -247,7 +247,7 @@ export const withdraw = async (
       }),
     });
 
-    console.log(response, response.json());
+    console.log(response);
 
     const txResponse = await response.json();
 
