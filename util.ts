@@ -51,8 +51,10 @@ export const parseNote = async (noteString) => {
   try {
     const noteArray = noteString.split('0x');
     console.log({ noteArray });
-    const noteRegex = /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)/g;
+    const noteRegex =
+      /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<guess>\d+)-(?<drawId>\d+)/g;
     const match = noteRegex.exec(noteArray[0]);
+    console.log({ match });
     const bytesArrayNullifier = noteArray[1]
       .replace('-', '')
       .split(',')
@@ -63,7 +65,10 @@ export const parseNote = async (noteString) => {
       .split(',')
       .map((x) => +x);
     const secret = new Uint8Array(bytesArraySecret);
-    return createDeposit(nullifier, secret, parseInt(match[3]));
+    return {
+      deposit: await createDeposit(nullifier, secret, parseInt(match[3])),
+      drawId: parseInt(match[4]),
+    };
   } catch (err) {
     console.log({ err });
   }
@@ -130,7 +135,7 @@ const generateMerkleProof = async (deposit, drawId, contract: Pool) => {
     return {
       type: 'error',
       title: 'Already Spent',
-      message: 'The provided ticket is already spent',
+      message: 'The provided note is already spent',
     };
   }
   if (leafIndex < 0) {
@@ -206,7 +211,7 @@ export const withdraw = async (
   contract: Pool
 ) => {
   try {
-    const deposit = await parseNote(note);
+    const { deposit, drawId } = await parseNote(note);
     console.log({ deposit });
     if (!deposit) {
       return {
@@ -277,7 +282,7 @@ export const winning = async (
   contract: Pool
 ) => {
   try {
-    const deposit = await parseNote(note);
+    const { deposit } = await parseNote(note);
     if (!deposit) {
       return {
         type: 'error',
@@ -452,14 +457,21 @@ export const getAddress = () => {
   return '0xd99A6aCb6Ee70a2CedBcA15B6f7c5A165509bb68';
 };
 
-export const checkBlindGuess = async (note: string, random: any) => {
-  const deposit = await parseNote(note);
+export const checkBlindGuess = async (note: string, random: any, draw: any) => {
+  const { deposit, drawId } = await parseNote(note);
   if (!deposit) {
     return {
       type: 'error',
       title: 'Invalid Note formet',
       message:
         'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
+    };
+  }
+  if (drawId !== parseInt(draw)) {
+    return {
+      type: 'error',
+      title: 'Invalid Draw',
+      message: `Your deposited note has drawId ${drawId} and your are checking in draw ${draw}`,
     };
   }
   if (deposit.guess === parseInt(random)) {

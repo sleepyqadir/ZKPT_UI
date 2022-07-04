@@ -43,6 +43,7 @@ import {
   generateNote,
   withdraw,
   getAddress,
+  shortenHex,
 } from '../util'
 import { useState, useEffect } from 'react'
 import useZKPoolContract from '../hooks/useZkPoolContract'
@@ -56,7 +57,7 @@ const alertTemp = {
 }
 
 const successTemp = {
-  type: 'sucess',
+  type: 'success',
   title: 'sucesss',
   message:
     'https://rinkeby.etherscan.io/tx/0x2b306ca659344eb234c01caaa6fa7d2958b33abeeeff42e1e078d88c535f572e',
@@ -85,7 +86,7 @@ function App() {
     let denomination: number =
       parseInt((await contract.denomination()).toString()) / 1e18
     setDraw(draw)
-    
+
     setDenomination(denomination)
   }
 
@@ -268,7 +269,11 @@ function App() {
               <AlertTitle mt={4} mb={1} fontSize="lg">
                 {alert.title}
               </AlertTitle>
-              <AlertDescription maxWidth="md">{alert.message}</AlertDescription>
+              <AlertDescription maxWidth="md">
+                {alert.type === 'success'
+                  ? `${shortenHex(alert.message, 50)}`
+                  : alert.message}
+              </AlertDescription>
             </Box>
             {alert.type === 'success' && (
               <Grid margin="2" templateColumns="repeat(2, 1fr)" gap={6}>
@@ -285,9 +290,10 @@ function App() {
                 <GridItem>
                   <Button>
                     <Link href={alert.message}>
-                      <a target="_blank"></a>
+                      <a target="_blank" rel="noopener noreferrer">
+                        <ExternalLinkIcon />
+                      </a>
                     </Link>
-                    <ExternalLinkIcon />
                   </Button>
                 </GridItem>
               </Grid>

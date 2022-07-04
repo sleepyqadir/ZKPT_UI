@@ -22,7 +22,13 @@ import {
   FormErrorMessage,
   Stack,
 } from '@chakra-ui/react'
-import { checkBlindGuess, getAddress, withdraw, winning } from '../util'
+import {
+  checkBlindGuess,
+  getAddress,
+  withdraw,
+  winning,
+  shortenHex,
+} from '../util'
 import { useState } from 'react'
 import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import Link from 'next/link'
@@ -86,7 +92,7 @@ function Check() {
       setWithdrawLoader(false)
       // @ts-ignore
       setAlert(alert)
-      
+
       onIsAlertOpen()
     } catch (err) {
       setWithdrawLoader(false)
@@ -105,8 +111,9 @@ function Check() {
   const onCheckEligibility = async () => {
     try {
       setCheckLoader(true)
-      const response = await checkBlindGuess(withdrawNote, random)
+      const response = await checkBlindGuess(withdrawNote, random, title)
       if (response.type === 'eligibility') {
+        // @ts-ignore
         setMessage(response)
         setCheckLoader(false)
       } else {
@@ -271,7 +278,11 @@ function Check() {
               <AlertTitle mt={4} mb={1} fontSize="lg">
                 {alert.title}
               </AlertTitle>
-              <AlertDescription maxWidth="md">{alert.message}</AlertDescription>
+              <AlertDescription maxWidth="md">
+                {alert.type === 'success'
+                  ? `${shortenHex(alert.message, 50)}`
+                  : alert.message}
+              </AlertDescription>
             </Box>
             {alert.type === 'success' && (
               <Grid margin="2" templateColumns="repeat(2, 1fr)" gap={6}>
@@ -288,9 +299,10 @@ function Check() {
                 <GridItem>
                   <Button>
                     <Link href={alert.message}>
-                      <a target="_blank"></a>
+                      <a target="_blank" rel="noopener noreferrer">
+                        <ExternalLinkIcon />
+                      </a>
                     </Link>
-                    <ExternalLinkIcon />
                   </Button>
                 </GridItem>
               </Grid>
