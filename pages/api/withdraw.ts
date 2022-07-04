@@ -50,10 +50,8 @@ export default async (req, res) => {
     });
     console.log({ tx });
 
-    const txReciept = await tx.wait();
-
-    console.log({ txReciept });
-    res.json(txReciept);
+    console.log({ tx });
+    res.json(tx);
   } catch (err) {
     console.log({ err });
     res.json(err);
