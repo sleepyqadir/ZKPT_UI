@@ -114,6 +114,7 @@ function App() {
         const newDeposit = await createDeposit(undefined, undefined, value)
         setDeposit(newDeposit)
         let draw: number = (await contract.currentDrawId()).toNumber()
+        setDraw(draw)
         const depositNote = await generateNote(newDeposit, draw)
         setNote(depositNote)
       }
@@ -125,7 +126,7 @@ function App() {
 
   const onDepositTransaction = async () => {
     setDepositLoader(false)
-    const alert = await depositEth(deposit, contract)
+    const alert = await depositEth(deposit, contract,draw)
     setSendDepositLoader(false)
     setAlert(alert)
     onIsAlertOpen()

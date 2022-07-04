@@ -12,6 +12,7 @@ const provider = new DefenderRelayProvider(credentials);
 
 const signer = new DefenderRelaySigner(credentials, provider, {
   speed: 'fast',
+  validForSeconds: 600,
 });
 
 import POOL_ABI from '../../contracts/Pool.json';

@@ -171,15 +171,22 @@ export const parseBalance = (
   decimalsToDisplay = 3
 ) => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
 
-export const depositEth = async (deposit: Deposit, contract: Pool) => {
+export const depositEth = async (deposit: Deposit, contract: Pool, draw) => {
   try {
     const network = await contract.signer.provider.getNetwork();
+    let currentDraw: number = (await contract.currentDrawId()).toNumber();
     const valid = isSupportedNetwork(network.chainId);
     if (!valid) {
       return {
         type: 'error',
         title: 'Network Errr',
         message: 'the selected network is not supported yet try [rinkeby]',
+      };
+    } else if (parseInt(draw)! == currentDraw) {
+      return {
+        type: 'error',
+        title: 'Draw Id',
+        message: `the draw ${draw} is ended please create new note for drawId ${currentDraw}`,
       };
     } else {
       const commitment = deposit.commitment;
@@ -263,7 +270,9 @@ export const withdraw = async (
       return {
         type: 'error',
         title: 'Something went wrong',
-        message: txResponse.reason ? txResponse.reason : "Something went wrong please try again!" ,
+        message: txResponse.reason
+          ? txResponse.reason
+          : 'Something went wrong please try again!',
       };
     }
   } catch (err) {
