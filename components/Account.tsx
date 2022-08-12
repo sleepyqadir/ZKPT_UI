@@ -4,21 +4,27 @@ import { useEffect, useState } from 'react'
 import { injected } from '../connectors'
 import useENSName from '../hooks/useENSName'
 import useMetaMaskOnboarding from '../hooks/useMetaMaskOnboarding'
+import { shortenHex, switchNetwork } from '../util'
 import {
-  formatEtherscanLink,
-  isSupportedNetwork,
-  shortenHex,
-  switchNetwork,
-} from '../util'
-import { Button, Icon } from '@chakra-ui/react'
-import { useRouter } from 'next/router'
+  Button,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Box,
+  Text,
+} from '@chakra-ui/react'
+import { activeNetworks, networks, networksSwitchId } from '../config'
 type AccountProps = {
   triedToEagerConnect: boolean
 }
 
 const Account = ({ triedToEagerConnect }: AccountProps) => {
-  const { active, error, activate, chainId, account, setError } = useWeb3React()
-  const router = useRouter()
+  const { active, error, activate, account, setError } = useWeb3React()
+
+  const [menuHeight, setMenuHeight] = useState(null)
+
   const {
     isMetaMaskInstalled,
     isWeb3Available,
@@ -35,27 +41,58 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
     }
   }, [active, error, stopOnboarding])
 
+  const getNetworks = () => {
+    const options = []
+    for (const key in networks) {
+      options.push(
+        <MenuItem onClick={() => switchNetwork(networksSwitchId[key])}>
+          <Text>{networks[key]}</Text>
+          <Box pos="absolute" ml="80%">
+            <Icon
+              viewBox="0 0 200 200"
+              color={activeNetworks[key] ? 'green.500' : 'red.500'}
+              style={{ marginRight: '10px' }}
+            >
+              <path
+                fill="currentColor"
+                d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+              />
+            </Icon>
+          </Box>
+        </MenuItem>,
+      )
+    }
+    return options
+  }
+
   const ENSName = useENSName(account)
 
   if (error) {
     return (
-      <Button
-        onClick={async () => {
-          const success = await switchNetwork(true)
-        }}
-      >
-        <Icon
-          viewBox="0 0 200 200"
-          color="red.500"
-          style={{ marginRight: '10px' }}
+      // @ts-ignore
+      <Menu className="dropdown" closeOnSelect={false}>
+        <MenuButton
+          as={Button}
+          rightIcon={
+            <Icon
+              viewBox="0 0 200 200"
+              color="red.500"
+              style={{ marginRight: '10px' }}
+            >
+              <path
+                fill="currentColor"
+                d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+              />
+            </Icon>
+          }
         >
-          <path
-            fill="currentColor"
-            d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-          />
-        </Icon>
-        Switch Network
-      </Button>
+          {' '}
+          Switch Network
+        </MenuButton>
+        <MenuList style={{ height: menuHeight }} className="dropdown">
+          <div className="main-menu">{getNetworks()}</div>
+        </MenuList>
+      </Menu>
     )
   }
 
@@ -76,7 +113,6 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
                 // ignore the error if it's a user rejected request
                 if (error instanceof UserRejectedRequestError) {
                   setConnecting(false)
-                  switchNetwork(true)
                 } else {
                   setError(error)
                 }
