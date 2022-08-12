@@ -1,12 +1,13 @@
 import { Contract } from '@ethersproject/contracts';
 import { useWeb3React } from '@web3-react/core';
 import { useMemo } from 'react';
+import { getAddress } from '../util';
 
 export default function useContract<T extends Contract = Contract>(
-  address: string,
   ABI: any
 ): T | null {
   const { library, account, chainId } = useWeb3React();
+  const address = getAddress(chainId);
   return useMemo(() => {
     if (!address || !ABI || !library || !chainId) {
       return null;
