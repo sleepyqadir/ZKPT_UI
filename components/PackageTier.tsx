@@ -38,8 +38,6 @@ const PackageTier = ({
   isCompleted,
   random,
 }: PackageTierProps) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const finalRef = useRef(null)
   const router = useRouter()
 
   return (

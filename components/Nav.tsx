@@ -4,7 +4,6 @@ import {
   Flex,
   Link,
   Button,
-  useDisclosure,
   useColorModeValue,
   Stack,
   useColorMode,
@@ -14,25 +13,9 @@ import { useWeb3React } from '@web3-react/core'
 import useEagerConnect from '../hooks/useEagerConnect'
 import Account from './Account'
 import Network from './Network'
-import { Router } from 'next/router'
-// import ETHBalance from './ETHBalance'
 import { useRouter } from 'next/router'
-import logo from '../public/images/logo.png'
 import Image from 'next/image'
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={'md'}
-    _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
-    }}
-    href={'#'}
-  >
-    {children}
-  </Link>
-)
+import { isSupportedNetwork } from '../util'
 
 type NavProps = {
   page: string
@@ -40,8 +23,7 @@ type NavProps = {
 
 export default function Nav({ page }: NavProps) {
   const { colorMode, toggleColorMode } = useColorMode()
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const { account, library, chainId } = useWeb3React()
+  const { account, chainId } = useWeb3React()
   const triedToEagerConnect = useEagerConnect()
   const router = useRouter()
   return (
@@ -58,7 +40,7 @@ export default function Nav({ page }: NavProps) {
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={7}>
-              {typeof account === 'string' && chainId === 137 && (
+              {typeof account === 'string' && isSupportedNetwork(chainId) && (
                 <Button onClick={() => router.push(`/${page.toLowerCase()}`)}>
                   {page}
                 </Button>
@@ -66,7 +48,6 @@ export default function Nav({ page }: NavProps) {
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
               </Button>
-              {/* {typeof account === 'string' && <ETHBalance />} */}
               <Network />
               <Account triedToEagerConnect={triedToEagerConnect} />
             </Stack>

@@ -10,9 +10,8 @@ import {
 import { ReactNode, useEffect, useState } from 'react'
 import { BsPerson } from 'react-icons/bs'
 import { FiServer } from 'react-icons/fi'
-import { FiDollarSign } from 'react-icons/fi'
 import useZKPoolContract from '../hooks/useZkPoolContract'
-import { getAddress } from '../util'
+import { useWeb3React } from '@web3-react/core'
 
 interface StatsCardProps {
   title: string
@@ -50,32 +49,23 @@ function StatsCard(props: StatsCardProps) {
 }
 
 export default function Statistics() {
-  const contract = useZKPoolContract(getAddress())
+  const { chainId } = useWeb3React()
+  const contract = useZKPoolContract()
 
   const [users, setUsers] = useState(0)
   const [drawsCount, setDrawsCount] = useState(0)
   const [poolBalance, setPoolBalance] = useState(0)
 
-  const getStats = async () => {
-    const users = await contract.nextIndex()
-    setUsers(users)
-    const draws = await contract.currentDrawId()
-    const poolBalance = await contract.getBalance()
-    console.log({ poolBalance })
-    setPoolBalance(parseInt(poolBalance.toString()) / 1e18)
-    setDrawsCount(parseInt(draws.toString()) + 1)
-  }
-
-  // useEffect(() => {
-  //   contract && getStats()
-  //   setTimeout(() => {
-  //     contract && getStats()
-  //   }, 1000 * 30)
-  // }, [contract])
-
   useEffect(() => {
-    contract && getStats()
-  }, [contract])
+    ;(async () => {
+      const users = await contract.nextIndex()
+      setUsers(users)
+      const draws = await contract.currentDrawId()
+      const poolBalance = await contract.getBalance()
+      setPoolBalance(parseInt(poolBalance.toString()) / 1e18)
+      setDrawsCount(parseInt(draws.toString()) + 1)
+    })()
+  }, [chainId])
 
   return (
     <Box maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
