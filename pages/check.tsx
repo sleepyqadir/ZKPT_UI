@@ -34,9 +34,8 @@ import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import Link from 'next/link'
 import { ethers } from 'ethers'
 import useZKPoolContract from '../hooks/useZkPoolContract'
-import { useWindowSize } from 'react-use'
-import Confetti from 'react-confetti'
 import { useRouter } from 'next/router'
+import { useWeb3React } from '@web3-react/core'
 
 const Message = {
   title: 'title',
@@ -62,8 +61,10 @@ function Check() {
   const [withdrawLoader, setWithdrawLoader] = useState(false)
   const [withdrawAddress, setWithdrawAddress] = useState('')
 
-  const contract = useZKPoolContract(getAddress())
-  const { width, height } = useWindowSize()
+  const { chainId } = useWeb3React()
+
+  const contract = useZKPoolContract()
+
   const onWithdraw = async () => {
     try {
       if (!ethers.utils.isAddress(withdrawAddress)) {
@@ -79,14 +80,15 @@ function Check() {
           withdrawNote,
           withdrawAddress,
           contract,
+          chainId,
         )
       } else {
         alert = await withdraw(
-          title,
           random,
           withdrawNote,
           withdrawAddress,
           contract,
+          chainId,
         )
       }
       setWithdrawLoader(false)
@@ -213,7 +215,6 @@ function Check() {
                 <FormErrorMessage>Invalid Address Formet</FormErrorMessage>
               )}
             </FormControl>{' '}
-            {/* TODO add the try another button here */}
             <Stack direction={'row'} spacing={7}>
               <Button
                 colorScheme={'orange'}

@@ -51,17 +51,11 @@ import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useWeb3React } from '@web3-react/core'
 import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import Link from 'next/link'
+
 const alertTemp = {
   type: 'error',
   title: 'title',
   message: 'message',
-}
-
-const successTemp = {
-  type: 'success',
-  title: 'sucesss',
-  message:
-    'https://polygonscan.com/tx/0x2b306ca659344eb234c01caaa6fa7d2958b33abeeeff42e1e078d88c535f572e',
 }
 
 function App() {
@@ -71,8 +65,8 @@ function App() {
     onOpen: onIsAlertOpen,
     onClose: onIsAlertClose,
   } = useDisclosure()
-  const contract = useZKPoolContract(getAddress())
-  const { account, chainId } = useWeb3React()
+  const { account, chainId, error } = useWeb3React()
+  const contract = useZKPoolContract()
   const [note, setNote] = useState('')
   const [deposit, setDeposit] = useState(null)
   const [depositLoader, setDepositLoader] = useState(false)
@@ -82,18 +76,18 @@ function App() {
   const [draw, setDraw] = useState(0)
   const [denomination, setDenomination] = useState(0)
 
-  const getDrawNo = async () => {
-    let draw: number = (await contract.currentDrawId()).toNumber()
-    let denomination: number =
-      parseInt((await contract.denomination()).toString()) / 1e18
-    setDraw(draw)
-
-    setDenomination(denomination)
-  }
-
   useEffect(() => {
-    contract && getDrawNo()
-  }, [contract])
+    if (contract) {
+      ;(async () => {
+        let draw: number = (await contract.currentDrawId()).toNumber()
+        let denomination: number =
+          parseInt((await contract.denomination()).toString()) / 1e18
+        setDraw(draw)
+        setDenomination(denomination)
+      })()
+    }
+  }, [chainId])
+
   const handleChange = (value) => setValue(value)
 
   const onDeposit = async () => {
@@ -143,10 +137,10 @@ function App() {
       maxW="1200px"
     >
       <Nav page={'Draws'} />
-      {!isSupportedNetwork(chainId) && (
-        <Alert status="error">
+      {error && (
+        <Alert status="error" style={{ marginTop: '200' }}>
           <AlertIcon />
-          The current selected network is not supported switch to polygon
+          {`${error}`}
         </Alert>
       )}{' '}
       <Container
@@ -245,7 +239,7 @@ function App() {
         ) : (
           <Box maxW="32rem">
             <Heading mb={4} style={{ textAlign: 'center', marginTop: '45%' }}>
-              Connect Your Wallet To Buy Ticket!
+              Connect Your Wallet
             </Heading>
           </Box>
         )}

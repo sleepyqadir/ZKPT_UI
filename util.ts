@@ -7,6 +7,13 @@ import path from 'path';
 import getConfig from 'next/config';
 import { Deposit } from './classes/deposit';
 import type { Pool } from './contracts/types';
+import {
+  ETHERSCAN_PREFIXES,
+  networks,
+  poolContracts,
+  providers,
+  relayerAddress,
+} from './config';
 const circomlibjs = require('circomlibjs');
 const snarkjs = require('snarkjs');
 
@@ -22,15 +29,6 @@ export function shortenHex(hex: string, length = 4) {
     hex.length - length
   )}`;
 }
-
-const ETHERSCAN_PREFIXES = {
-  1: '',
-  3: 'ropsten',
-  4: 'rinkeby',
-  5: 'goerli',
-  42: 'kovan',
-  137: 'polygon mainnet',
-};
 
 export const createDeposit = async (
   nullifier = ethers.utils.randomBytes(15),
@@ -51,11 +49,9 @@ export const generateNote = async (deposit: Deposit, draw: number) => {
 export const parseNote = async (noteString) => {
   try {
     const noteArray = noteString.split('0x');
-    console.log({ noteArray });
     const noteRegex =
       /zkpt-(?<currency>\w+)-(?<amount>[\d.]+)-(?<guess>\d+)-(?<drawId>\d+)/g;
     const match = noteRegex.exec(noteArray[0]);
-    console.log({ match });
     const bytesArrayNullifier = noteArray[1]
       .replace('-', '')
       .split(',')
@@ -91,8 +87,6 @@ export const poseidonHash = (poseidon: any, inputs: BigNumberish[]) => {
 };
 
 const generateMerkleProof = async (deposit, drawId, contract: Pool) => {
-  console.log('we here ==========>');
-  console.log(contract);
   const eventFilter = contract.filters.Deposit();
   const events = await contract.queryFilter(eventFilter, 30339000, 'latest');
   const poseidon = await circomlibjs.buildPoseidon();
@@ -102,8 +96,6 @@ const generateMerkleProof = async (deposit, drawId, contract: Pool) => {
     deposit.commitment,
     drawId,
   ]);
-
-  console.log({ saltedCommitment });
 
   const leaves = events
     .sort((a, b) => a.args.leafIndex - b.args.leafIndex) // Sort events in chronological order
@@ -115,7 +107,6 @@ const generateMerkleProof = async (deposit, drawId, contract: Pool) => {
 
   // Find current commitment in the tree
   const depositEvent = events.find((e) => {
-    console.log(e.args.commitment, saltedCommitment);
     return e.args.commitment === saltedCommitment;
   });
 
@@ -152,29 +143,16 @@ const generateMerkleProof = async (deposit, drawId, contract: Pool) => {
   return { path_elements, path_index, root };
 };
 
-export function formatEtherscanLink(
-  type: 'Account' | 'Transaction',
-  data: [number, string]
-) {
-  switch (type) {
-    case 'Account': {
-      const [chainId, address] = data;
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/address/${address}`;
-    }
-    case 'Transaction': {
-      const [chainId, hash] = data;
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/tx/${hash}`;
-    }
-  }
-}
-
 export const parseBalance = (
   value: BigNumberish,
   decimals = 18,
   decimalsToDisplay = 3
 ) => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
 
-export const depositEth = async (deposit: Deposit, contract: Pool, draw) => {
+export const depositEth = async (
+  deposit: Deposit,
+  contract: Pool,
+) => {
   try {
     const network = await contract.signer.provider.getNetwork();
     let currentDraw: number = (await contract.currentDrawId()).toNumber();
@@ -183,11 +161,11 @@ export const depositEth = async (deposit: Deposit, contract: Pool, draw) => {
       return {
         type: 'error',
         title: 'Network Errr',
-        message: 'the selected network is not supported yet try [polygon]',
+        message:
+          'the selected network is not supported yet try connection [polygon mainnet , polygon testnet , rinkeby ]',
       };
     } else {
       const commitment = deposit.commitment;
-      const nullifierHash = deposit.nullifierHash;
       const tx = await contract.deposit(commitment, {
         value: ethers.utils.parseEther('1'),
       });
@@ -195,7 +173,7 @@ export const depositEth = async (deposit: Deposit, contract: Pool, draw) => {
       return {
         type: 'success',
         title: 'Transaction Success',
-        message: `https://polygonscan.com/tx/${txReceipt.transactionHash}`,
+        message: `${ETHERSCAN_PREFIXES[network.chainId]}${txReceipt.transactionHash}`,
       };
     }
   } catch (err) {
@@ -208,15 +186,14 @@ export const depositEth = async (deposit: Deposit, contract: Pool, draw) => {
 };
 
 export const withdraw = async (
-  drawId,
   random,
   note,
   recipient,
-  contract: Pool
+  contract: Pool,
+  chainId: number
 ) => {
   try {
     const { deposit, drawId } = await parseNote(note);
-    console.log({ deposit });
     if (!deposit) {
       return {
         type: 'error',
@@ -231,7 +208,7 @@ export const withdraw = async (
       deposit,
       recipient,
       contract,
-      '0x99d667ff3e5891a5f40288cb94276158ae8176a0',
+      relayerAddress[chainId],
       false
     );
 
@@ -239,7 +216,6 @@ export const withdraw = async (
       return snarkProof;
     }
 
-    console.log({ proof: snarkProof.proof, args: snarkProof.args });
     const response = await fetch(`/api/withdraw/`, {
       method: 'POST',
       headers: {
@@ -248,20 +224,17 @@ export const withdraw = async (
       body: JSON.stringify({
         proof: snarkProof.proof,
         args: snarkProof.args,
+        chainId: chainId,
       }),
     });
 
-    console.log(response);
-
     const txResponse = await response.json();
-
-    console.log({ txResponse });
 
     if (txResponse.transactionHash) {
       return {
         type: 'success',
         title: 'Transaction Success',
-        message: `https://polygonscan.com/tx/${txResponse.transactionHash}`,
+        message: `${ETHERSCAN_PREFIXES[chainId]}${txResponse.transactionHash}`,
       };
     } else {
       return {
@@ -273,7 +246,6 @@ export const withdraw = async (
       };
     }
   } catch (err) {
-    console.log('error while withdrawing', { err });
     return {
       type: 'error',
       title: 'Something went wrong',
@@ -282,12 +254,17 @@ export const withdraw = async (
   }
 };
 
+export const getProviderByChainId = async (chainId) => {
+  return providers[chainId];
+};
+
 export const winning = async (
   drawId,
   random,
   note,
   recipient,
-  contract: Pool
+  contract: Pool,
+  chainId: number
 ) => {
   try {
     const { deposit } = await parseNote(note);
@@ -305,7 +282,7 @@ export const winning = async (
       deposit,
       recipient,
       contract,
-      '0x99d667ff3e5891a5f40288cb94276158ae8176a0',
+      relayerAddress[chainId],
       true
     );
 
@@ -313,7 +290,6 @@ export const winning = async (
       return snarkProof;
     }
 
-    console.log({ proof: snarkProof.proof, args: snarkProof.args });
     const response = await fetch(`/api/winning/`, {
       method: 'POST',
       headers: {
@@ -322,6 +298,7 @@ export const winning = async (
       body: JSON.stringify({
         proof: snarkProof.proof,
         args: snarkProof.args,
+        chainId: chainId,
       }),
     });
 
@@ -331,10 +308,9 @@ export const winning = async (
       type: 'success',
       title: 'Transaction Success',
       // @ts-ignore
-      message: `https://polygonscan.com/tx/${response.transactionHash}`,
+      message: `${ETHERSCAN_PREFIXES[chainId]}${response.transactionHash}`,
     };
   } catch (err) {
-    console.log('error while withdrawing', { err });
     return {
       type: 'error',
       title: 'Something went wrong',
@@ -416,8 +392,6 @@ const generateSnarkProof = async (
     pathIndices: path_index,
   };
 
-  console.log({ witness });
-
   const solidityProof = await prove(witness, won);
 
   const args = [
@@ -434,16 +408,6 @@ const generateSnarkProof = async (
 };
 
 export const getNetwork = (id: number) => {
-  const networks = {
-    1: 'mainnet',
-    3: 'robston',
-    4: 'rinkeby',
-    5: 'goerli',
-    137: 'Polygon Mainnet',
-    1666600000: 'Mainnet Harmony',
-    1666900000: 'Devnet Harmony',
-  };
-
   return networks[id];
 };
 
@@ -451,18 +415,17 @@ export const isSupportedNetwork = (id: number): boolean => {
   const networks = {
     1: false,
     3: false,
-    4: false,
+    4: true,
     5: false,
     137: true,
-    1666600000: false,
-    1666900000: false,
+    80001: true,
   };
 
   return networks[id];
 };
 
-export const getAddress = () => {
-  return '0xebC02B3371ef6f01309c5cC2Ef32a755FDeeEDef';
+export const getAddress = (chainId) => {
+  return poolContracts[chainId];
 };
 
 export const checkBlindGuess = async (note: string, random: any, draw: any) => {
@@ -475,7 +438,6 @@ export const checkBlindGuess = async (note: string, random: any, draw: any) => {
         'note formet should be [zkpt]-[amount]-[netId]-0x[nullifier]0x[secret]',
     };
   }
-  console.log(drawId, draw);
   if (drawId !== parseInt(draw)) {
     return {
       type: 'error',
@@ -500,19 +462,15 @@ export const checkBlindGuess = async (note: string, random: any, draw: any) => {
   }
 };
 
-export const switchNetwork = (mainnet: boolean) => {
-  if (mainnet) {
-    // @ts-ignore
-    window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x89' }],
-    });
-    return;
-  } else {
-    // @ts-ignore
-    window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x89' }],
-    });
-  }
+export const switchNetwork = (hexId) => {
+  // @ts-ignore
+  window.ethereum.on('chainChanged', () => {
+    window.location.reload();
+  });
+  // @ts-ignore
+  window.ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: hexId }],
+  });
+  return;
 };

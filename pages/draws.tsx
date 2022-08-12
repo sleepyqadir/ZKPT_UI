@@ -3,45 +3,30 @@ import {
   Alert,
   AlertIcon,
   Box,
-  Button,
   Container,
   Divider,
   Heading,
   Stack,
-  Text,
 } from '@chakra-ui/react'
 import PackageTier from '../components/PackageTier'
 import Statistics from '../components/Statistics'
 import useZKPoolContract from '../hooks/useZkPoolContract'
 import { useState, useEffect } from 'react'
-import { getAddress, isSupportedNetwork } from '../util'
-import { ethers } from 'ethers'
+import { isSupportedNetwork } from '../util'
 import { useWeb3React } from '@web3-react/core'
 
 function Draw() {
-  const contract = useZKPoolContract(getAddress())
-
-  const { account, chainId } = useWeb3React()
-
+  const { chainId, error } = useWeb3React()
+  const contract = useZKPoolContract()
   const [draws, setDraws] = useState([])
 
-  const getStats = async () => {
-    const draws = await contract.getDraws()
-    const drawReverse = [...draws].reverse()
-    console.log(drawReverse[0].endTime.toString())
-    setDraws(drawReverse)
-  }
-
-  // useEffect(() => {
-  //   contract && getStats()
-  //   setTimeout(() => {
-  //     contract && getStats()
-  //   }, 1000 * 30)
-  // }, [contract])
-
   useEffect(() => {
-    contract && getStats()
-  }, [contract])
+    ;(async () => {
+      const draws = await contract.getDraws()
+      const drawReverse = [...draws].reverse()
+      setDraws(drawReverse)
+    })()
+  }, [chainId])
 
   return (
     <Container
@@ -53,11 +38,10 @@ function Draw() {
       maxW="1200px"
     >
       <Nav page={'App'} />
-      {!isSupportedNetwork(chainId) && (
+      {error && (
         <Alert status="error">
           <AlertIcon />
-          The current selected network is not supported switch to rinkeby to see
-          data
+          {`${error}`}
         </Alert>
       )}{' '}
       <Statistics />
